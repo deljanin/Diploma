@@ -1,17 +1,37 @@
-package com.deljanin;
+package entity;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import data.IntersectionData;
+
+import java.io.*;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class Individual extends Thread{
-//    Binary vector ...
+    ArrayList<Intersection> intersections;
     private int fitness;
+    private String intersections_file;
+    private int individual_size;
 
-    public Individual(){
+    public Individual(int individual_size/*, String intersections_file*/){
+        this.intersections = new ArrayList<>();
+        this.individual_size = individual_size;
+        this.intersections_file = intersections_file;
+        initialise();
     }
-//       Executes a simulation
-//        fitness is time orr?
+    private void initialise(/*Random random*/) {
+        for (int i = 0; i < individual_size; i++) {
+            Random r = new Random();
+            this.intersections.add(Intersection.values()[r.nextInt(Intersection.values().length)]);
+        }
+//        System.out.println("Thread: " + this.hashCode());
+//        intersections.forEach(i -> System.out.print(i));
+//        System.out.println();
+    }
 
     @Override
     public void run() {
@@ -38,6 +58,7 @@ public class Individual extends Thread{
         this.fitness = Integer.parseInt(out);
         System.out.println("Simulation ticks: " + fitness);
     }
+
     public void start(){
         new Thread(this).start();
     }
