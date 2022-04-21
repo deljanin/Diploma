@@ -8,4 +8,15 @@ public class IntersectionData {
     public int x;
     public int y;
 
+    @Override
+    public String toString() {
+        return "IntersectionData{" +
+                "id=" + id +
+                ", type=" + type +
+                ", arc1=" + arc1 +
+                ", arc2=" + arc2 +
+                ", x=" + x +
+                ", y=" + y +
+                '}';
+    }
 }

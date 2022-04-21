@@ -14,20 +14,10 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-        List<IntersectionData> intersectionsData = loadIntersections();
 
-        Population population = new Population(4, intersectionsData.size());
+
+        Population population = new Population(4);
 
     }
 
-    public static List<IntersectionData> loadIntersections(){
-        Type listType = new TypeToken<ArrayList<IntersectionData>>() {}.getType();
-        JsonReader reader = null;
-        try {
-            reader = new JsonReader(new FileReader("simulator/intersections.json"));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        return new Gson().fromJson(reader, listType);
-    }
 }

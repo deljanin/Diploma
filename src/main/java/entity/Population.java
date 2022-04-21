@@ -1,25 +1,42 @@
 package entity;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import data.IntersectionData;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Population {
     private Vector<Individual> population;
     private int generation_size = 4;
+    private List<IntersectionData> intersectionsData;
 
-    public Population(int generation_size, int individual_size) {
+    public Population(int generation_size) {
         this.generation_size = generation_size;
-        initializeGeneration(individual_size);
+        this.intersectionsData = loadIntersections();
+        initializeGeneration(intersectionsData.size());
         startGeneration();
     }
 
     public void initializeGeneration(int individual_size) {
+        File generation_folder = new File("generations\\"+"Gen0");
+//TODO Check this auto remove!!
+        //generation_folder.delete();
+//        if(!generation_folder.mkdir()) System.out.println("Failed to create generation folder");
         population = new Vector<>();
         for (int i = 0; i < generation_size; i++) {
-            population.add(new Individual(individual_size));
+            population.add(new Individual(individual_size,"0_"+i, intersectionsData, generation_folder.toString()));
         }
+
     }
     public void startGeneration(){
         population.forEach(Individual::start);
@@ -68,5 +85,15 @@ public class Population {
 //        }
 //    }
 
+    public List<IntersectionData> loadIntersections(){
+        Type listType = new TypeToken<ArrayList<IntersectionData>>() {}.getType();
+        JsonReader reader = null;
+        try {
+            reader = new JsonReader(new FileReader("simulator/intersections.json"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return new Gson().fromJson(reader, listType);
+    }
 
 }
