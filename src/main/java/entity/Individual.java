@@ -1,12 +1,12 @@
 package entity;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
 import data.IntersectionData;
 
-import java.io.*;
-import java.lang.reflect.Type;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -14,46 +14,57 @@ import java.util.List;
 import java.util.Random;
 
 public class Individual extends Thread{
-    ArrayList<Intersection> intersections;
+    ArrayList<Intersection> intersections_enum;
     private int fitness;
     private int individual_size;
     private String individual_name;
-    private ArrayList<IntersectionData> intersectionsData_individual;
-    private String individual_intersectionsJson_path;
+    private ArrayList<IntersectionData> intersectionsData_individual_copy;
+    private String individual_intersectionsJson_path_enum;
     private String generation_folder;
 
     public Individual(int individual_size, String individual_name, List<IntersectionData> intersectionsData, String generation_folder){
-        this.intersections = new ArrayList<>();
         this.individual_size = individual_size;
 //TODO MAYBE THIS List copy is doing something strange
-        this.intersectionsData_individual = new ArrayList<>(List.copyOf(intersectionsData));
+        this.intersectionsData_individual_copy = new ArrayList<>(List.copyOf(intersectionsData));
         this.individual_name = individual_name;
         this.generation_folder = generation_folder;
+        randomize_intersection();
         initialise();
     }
-    private void initialise(/*Random random*/) {
-        for (int i = 0; i < individual_size; i++) {
-            Random r = new Random();
-            this.intersections.add(Intersection.values()[r.nextInt(Intersection.values().length)]);
-        }
+
+    public Individual(int individual_size, String individual_name, List<IntersectionData> intersectionsData, ArrayList<Intersection> intersections_enum, String generation_folder){
+        this.individual_size = individual_size;
+        this.intersectionsData_individual_copy = new ArrayList<>(List.copyOf(intersectionsData));
+        this.individual_name = individual_name;
+        this.generation_folder = generation_folder;
+        this.intersections_enum = intersections_enum;
+        initialise();
+    }
+    private void initialise() {
         File individual_folder = new File(generation_folder + "\\" + individual_name + "\\");
         if(!individual_folder.mkdir()) System.out.println("Failed to create individual folder");
 
-        for (int i = 0; i < intersectionsData_individual.size(); i++) {//
-            IntersectionData tmp = intersectionsData_individual.get(i);
-            tmp.type = type_converter(intersections.get(i));
-            intersectionsData_individual.set(i, tmp);
+        for (int i = 0; i < intersectionsData_individual_copy.size(); i++) {//
+            IntersectionData tmp = intersectionsData_individual_copy.get(i);
+            tmp.type = type_converter(intersections_enum.get(i));
+            intersectionsData_individual_copy.set(i, tmp);
         }
 
         try {
-            individual_intersectionsJson_path = individual_folder+"\\intersections.json";
-            Files.writeString(Path.of(individual_intersectionsJson_path),new Gson().toJson(intersectionsData_individual));
+            individual_intersectionsJson_path_enum = individual_folder+"\\intersections_enum.json";
+            Files.writeString(Path.of(individual_intersectionsJson_path_enum),new Gson().toJson(intersectionsData_individual_copy));
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
+    private void randomize_intersection(){
+        this.intersections_enum = new ArrayList<>();
+        for (int i = 0; i < individual_size; i++) {
+            Random r = new Random();
+            this.intersections_enum.add(Intersection.values()[r.nextInt(Intersection.values().length)]);
+        }
+    }
 
     @Override
     public void run() {
@@ -63,10 +74,10 @@ public class Individual extends Thread{
 
         if (System.getProperty("os.name").startsWith("Windows")) {
             builder = new ProcessBuilder(
-                    "cmd.exe", "/c", "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false config.json ..\\" + individual_intersectionsJson_path);
+                    "cmd.exe", "/c", "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false config.json ..\\" + individual_intersectionsJson_path_enum);
         } else {
             builder = new ProcessBuilder(
-                    "bash", "-c", "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false config.json ../" + individual_intersectionsJson_path);
+                    "bash", "-c", "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false config.json ../" + individual_intersectionsJson_path_enum);
         }
         builder.redirectErrorStream(true);
         Process p = null;
@@ -104,5 +115,17 @@ public class Individual extends Thread{
         }
         System.out.println("Type conversion error");
         return 1;
+    }
+
+    public ArrayList<Intersection> getIntersections_enum() {
+        return intersections_enum;
+    }
+
+    public void setIndividual_name(String individual_name) {
+        this.individual_name = individual_name;
+    }
+
+    public void setGeneration_folder(String generation_folder) {
+        this.generation_folder = generation_folder;
     }
 }

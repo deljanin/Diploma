@@ -13,25 +13,27 @@ import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
+
 
 public class Population {
-    private Vector<Individual> population;
+    private Vector<Individual> population = null;
     private int generation_size = 4;
     private List<IntersectionData> intersectionsData;
+    private int individual_size;
 
     public Population(int generation_size) {
         this.generation_size = generation_size;
         this.intersectionsData = loadIntersections();
-        initializeGeneration(intersectionsData.size());
+        this.individual_size = intersectionsData.size();
+        initializeGeneration("Gen0");
         startGeneration();
     }
 
-    public void initializeGeneration(int individual_size) {
-        File generation_folder = new File("generations\\"+"Gen0");
-
+    public void initializeGeneration(String generation_name) {
+        File generation_folder = new File("generations\\"+generation_name);
 
 //TODO Check this auto remove!!
+
         try {
             Files.walk(generation_folder.toPath())
                     .sorted(Comparator.reverseOrder())
@@ -43,41 +45,71 @@ public class Population {
 
 
         if(!generation_folder.mkdir()) System.out.println("Failed to create generation folder");
-        population = new Vector<>();
-        for (int i = 0; i < generation_size; i++) {
-            population.add(new Individual(individual_size,"0_"+i, intersectionsData, generation_folder.toString()));
+        if(population == null) {
+            population = new Vector<>();
+            for (int i = 0; i < generation_size; i++) {
+                population.add(new Individual(individual_size, generation_name + "_" + i, intersectionsData, generation_folder.toString()));
+            }
+        }else{
+            for (int i = 0; i < generation_size; i++) {
+                population.get(i).setIndividual_name(generation_name +"_"+i);
+                population.get(i).setGeneration_folder(generation_name);
+            }
         }
-
     }
+
     public void startGeneration(){
         population.forEach(Individual::start);
     }
 
-//    private Tuple makeKidsPair(Individual individual1, Individual individual2){
-//        ArrayList<Integer> individual1_firstHalf =
-//        String s1_fh = s1.getData().substring(0, s1.getData().length()/2);
-//        String s2_fh = s2.getData().substring(0, s2.getData().length()/2);
-//        String s1_sh = s1.getData().substring(s1.getData().length()/2);
-//        String s2_sh = s2.getData().substring(s2.getData().length()/2);
-//        return new Tuple(new Individual(s1_fh+s2_sh),new Individual(s2_fh+s1_sh));
-//    }
+    private Tuple crossover(Individual individual1, Individual individual2){
+        int end = individual1.getIntersections_enum().size();
+        int half = end/2;
+        List<Intersection> individual1_firstHalf = individual1.getIntersections_enum().subList(0,half);
+        List<Intersection> individual2_firstHalf = individual2.getIntersections_enum().subList(0,half);
 
-//    public static void newGeneration() {
-//        Vector<Individual> newGen = new Vector<>(population.size());
-//        Collections.sort(population,new SortByFitness());
-//        Collections.reverse(population);
-//        for (int i = 0; i < GENERATION_SIZE/2; i=i+2) {
-//            newGen.add(kids(population.get(i), population.get(i+1))[0]);
-//            newGen.add(kids(population.get(i), population.get(i+1))[1]);
-//        }
-//        newGen.addAll(population.subList(0,population.size()/2));
-//        population = newGen;
-//        calculateFitness();
-//    }
+        List<Intersection> individual1_secondHalf = individual1.getIntersections_enum().subList(half,end);
+        List<Intersection> individual2_secondHalf = individual2.getIntersections_enum().subList(half,end);
+        ArrayList<Intersection> indi1 = new ArrayList<Intersection>(individual1_firstHalf);
+        indi1.addAll(individual1_secondHalf);
+        ArrayList<Intersection> indi2 = new ArrayList<Intersection>(individual2_firstHalf);
+        indi2.addAll(individual2_secondHalf);
+        /*TODO NAME & GEN FOLDER*/
+        return new Tuple(
+                new Individual(individual_size,
+                "ToBeSet",
+                        intersectionsData,
+                        indi1,
+                "ToBeSet"),
 
-//    public static void mutate() {
+                new Individual(individual_size,
+                        "ToBeSet",
+                        intersectionsData,
+                        indi2,
+                        "ToBeSet"
+                        ));
+    }
+
+    public void newGeneration(String generation_name) {
+        Vector<Individual> newGen = new Vector<>(population.size());
+        Collections.sort(population, new IndividualComparator());
+        Collections.reverse(population);
+        for (int i = 0; i < population.size()/2; i=i+2) {
+            newGen.add(crossover(population.get(i), population.get(i+1)).getFirst());
+            newGen.add(crossover(population.get(i), population.get(i+1)).getSecond());
+        }
+        newGen.addAll(population.subList(0,population.size()/2));
+        population = newGen;
+    }
+
+    public void calculateFitness(String generation_name){
+        initializeGeneration(generation_name);
+        startGeneration();
+    }
+
+//    public void mutate() {
 //        for (Individual I: population) {
-//            for (int j = 0; j < TARGET.length(); j++) {
+//            for (int j = 0; j < individual_size; j++) {
 //                if (I.getData().charAt(j) != TARGET.charAt(j)){
 //                    //System.out.println(I.getData());
 //                    int randomNum = ThreadLocalRandom.current().nextInt(0,100);
