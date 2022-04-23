@@ -8,6 +8,10 @@ public class IntersectionData {
     public int x;
     public int y;
 
+    public void setType(int type) {
+        this.type = type;
+    }
+
     @Override
     public String toString() {
         return "IntersectionData{" +

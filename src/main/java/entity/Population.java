@@ -25,8 +25,10 @@ public class Population {
         this.generation_size = generation_size;
         this.intersectionsData = loadIntersections();
         this.individual_size = intersectionsData.size();
-        initializeGeneration("Gen0");
-        startGeneration();
+    }
+
+    public void startGeneration(){
+        population.forEach(Individual::start);
     }
 
     public void initializeGeneration(String generation_name) {
@@ -53,13 +55,10 @@ public class Population {
         }else{
             for (int i = 0; i < generation_size; i++) {
                 population.get(i).setIndividual_name(generation_name +"_"+i);
-                population.get(i).setGeneration_folder(generation_name);
+                population.get(i).setGeneration_folder("generations\\" + generation_name);
             }
+            population.forEach(Individual::initialise);
         }
-    }
-
-    public void startGeneration(){
-        population.forEach(Individual::start);
     }
 
     private Tuple crossover(Individual individual1, Individual individual2){
@@ -70,10 +69,11 @@ public class Population {
 
         List<Intersection> individual1_secondHalf = individual1.getIntersections_enum().subList(half,end);
         List<Intersection> individual2_secondHalf = individual2.getIntersections_enum().subList(half,end);
-        ArrayList<Intersection> indi1 = new ArrayList<Intersection>(individual1_firstHalf);
-        indi1.addAll(individual1_secondHalf);
-        ArrayList<Intersection> indi2 = new ArrayList<Intersection>(individual2_firstHalf);
-        indi2.addAll(individual2_secondHalf);
+
+        ArrayList<Intersection> indi1 = new ArrayList<>(individual1_firstHalf);
+        indi1.addAll(individual2_secondHalf);
+        ArrayList<Intersection> indi2 = new ArrayList<>(individual2_firstHalf);
+        indi2.addAll(individual1_secondHalf);
         /*TODO NAME & GEN FOLDER*/
         return new Tuple(
                 new Individual(individual_size,
@@ -87,7 +87,7 @@ public class Population {
                         intersectionsData,
                         indi2,
                         "ToBeSet"
-                        ));
+                ));
     }
 
     public void newGeneration(String generation_name) {
@@ -95,11 +95,12 @@ public class Population {
         Collections.sort(population, new IndividualComparator());
         Collections.reverse(population);
         for (int i = 0; i < population.size()/2; i=i+2) {
-            newGen.add(crossover(population.get(i), population.get(i+1)).getFirst());
-            newGen.add(crossover(population.get(i), population.get(i+1)).getSecond());
+            Tuple t = crossover(population.get(i), population.get(i+1));
+            newGen.add(t.getFirst());
+            newGen.add(t.getSecond());
         }
         newGen.addAll(population.subList(0,population.size()/2));
-        population = newGen;
+        this.population = newGen;
     }
 
     public void calculateFitness(String generation_name){

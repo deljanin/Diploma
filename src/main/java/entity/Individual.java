@@ -16,15 +16,14 @@ import java.util.Random;
 public class Individual extends Thread{
     ArrayList<Intersection> intersections_enum;
     private int fitness;
-    private int individual_size;
+    private final int individual_size;
     private String individual_name;
     private ArrayList<IntersectionData> intersectionsData_individual_copy;
-    private String individual_intersectionsJson_path_enum;
+    private String individual_intersectionsJson_path;
     private String generation_folder;
 
     public Individual(int individual_size, String individual_name, List<IntersectionData> intersectionsData, String generation_folder){
         this.individual_size = individual_size;
-//TODO MAYBE THIS List copy is doing something strange
         this.intersectionsData_individual_copy = new ArrayList<>(List.copyOf(intersectionsData));
         this.individual_name = individual_name;
         this.generation_folder = generation_folder;
@@ -38,21 +37,18 @@ public class Individual extends Thread{
         this.individual_name = individual_name;
         this.generation_folder = generation_folder;
         this.intersections_enum = intersections_enum;
-        initialise();
     }
-    private void initialise() {
+    public void initialise() {
         File individual_folder = new File(generation_folder + "\\" + individual_name + "\\");
         if(!individual_folder.mkdir()) System.out.println("Failed to create individual folder");
 
-        for (int i = 0; i < intersectionsData_individual_copy.size(); i++) {//
-            IntersectionData tmp = intersectionsData_individual_copy.get(i);
-            tmp.type = type_converter(intersections_enum.get(i));
-            intersectionsData_individual_copy.set(i, tmp);
+        for (int i = 0; i < intersectionsData_individual_copy.size(); i++) {
+            if(intersectionsData_individual_copy.get(i).type != 0) intersectionsData_individual_copy.get(i).setType(type_converter(intersections_enum.get(i)));
         }
 
         try {
-            individual_intersectionsJson_path_enum = individual_folder+"\\intersections_enum.json";
-            Files.writeString(Path.of(individual_intersectionsJson_path_enum),new Gson().toJson(intersectionsData_individual_copy));
+            individual_intersectionsJson_path = individual_folder+"\\intersections.json";
+            Files.writeString(Path.of(individual_intersectionsJson_path),new Gson().toJson(intersectionsData_individual_copy));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -71,13 +67,12 @@ public class Individual extends Thread{
         String path = System.getProperty("user.dir");
         String separator = System.getProperty("file.separator");
         ProcessBuilder builder;
-
         if (System.getProperty("os.name").startsWith("Windows")) {
             builder = new ProcessBuilder(
-                    "cmd.exe", "/c", "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false config.json ..\\" + individual_intersectionsJson_path_enum);
+                    "cmd.exe", "/c", "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false config.json ..\\" + individual_intersectionsJson_path);
         } else {
             builder = new ProcessBuilder(
-                    "bash", "-c", "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false config.json ../" + individual_intersectionsJson_path_enum);
+                    "bash", "-c", "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false config.json ../" + individual_intersectionsJson_path);
         }
         builder.redirectErrorStream(true);
         Process p = null;
@@ -90,7 +85,7 @@ public class Individual extends Thread{
             e.printStackTrace();
         }
         this.fitness = Integer.parseInt(out);
-        System.out.println("Simulation ticks: " + fitness);
+        System.out.println(individual_name+" Simulation ticks: " + fitness);
     }
 
     public void start(){
@@ -127,5 +122,13 @@ public class Individual extends Thread{
 
     public void setGeneration_folder(String generation_folder) {
         this.generation_folder = generation_folder;
+    }
+
+    @Override
+    public String toString() {
+        return "Individual{" +
+                "individual_name='" + individual_name + '\'' +
+                ", generation_folder='" + generation_folder + '\'' +
+                '}';
     }
 }
