@@ -22,19 +22,17 @@ public class Population {
     private List<IntersectionData> intersectionsData;
     private int individual_size;
     private String separator = System.getProperty("file.separator");
+    private int generation_count;
 
     public Population(int generation_size) {
         this.generation_size = generation_size;
         this.intersectionsData = loadIntersections();
         this.individual_size = intersectionsData.size();
+        this.generation_count = 0;
     }
 
-    public void startGeneration(){
-        population.forEach(Individual::start);
-    }
-
-    public void initialiseGeneration(String generation_name) {
-        File generation_folder = new File("generations"+separator+generation_name);
+    public void initialiseGeneration() {
+        File generation_folder = new File("generations"+separator+generation_count);
 
 //TODO Check this auto remove!!
 
@@ -52,15 +50,16 @@ public class Population {
         if(population == null) {
             population = new Vector<>();
             for (int i = 0; i < generation_size; i++) {
-                population.add(new Individual(individual_size, generation_name + "_" + i, intersectionsData, generation_folder.toString()));
+                population.add(new Individual(individual_size, generation_count + "_" + i, intersectionsData, generation_folder.toString()));
             }
         }else{
             for (int i = 0; i < generation_size; i++) {
-                population.get(i).setIndividual_name(generation_name +"_"+i);
-                population.get(i).setGeneration_folder("generations"+separator + generation_name);
+                population.get(i).setIndividual_name(generation_count +"_"+i);
+                population.get(i).setGeneration_folder("generations"+separator + generation_count);
             }
             population.forEach(Individual::initialise);
         }
+        this.generation_count++;
     }
 
     private Tuple crossover(Individual individual1, Individual individual2){
@@ -76,7 +75,6 @@ public class Population {
         indi1.addAll(individual2_secondHalf);
         ArrayList<Intersection> indi2 = new ArrayList<>(individual2_firstHalf);
         indi2.addAll(individual1_secondHalf);
-        /*TODO NAME & GEN FOLDER*/
         return new Tuple(
                 new Individual(individual_size,
                 "ToBeSet",
@@ -92,7 +90,7 @@ public class Population {
                 ));
     }
 
-    public void newGeneration(String generation_name) {
+    public void newGeneration() {
         Vector<Individual> newGen = new Vector<>(population.size());
         Collections.sort(population, new IndividualComparator());
         for (int i = 0; i < population.size()/2; i=i+2) {
@@ -104,10 +102,6 @@ public class Population {
         this.population = newGen;
     }
 
-    public void calculateFitness(String generation_name){
-        initialiseGeneration(generation_name);
-
-    }
 
     public void mutate(int mutation_chance) {
         Random r = new Random();

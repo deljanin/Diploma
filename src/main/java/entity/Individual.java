@@ -39,6 +39,7 @@ public class Individual extends Thread{
         this.generation_folder = generation_folder;
         this.intersections_enum = intersections_enum;
     }
+
     public void initialise() {
         File individual_folder = new File(generation_folder + separator + individual_name + separator);
         if(!individual_folder.mkdir()) System.out.println("Failed to create individual folder");
@@ -93,10 +94,10 @@ public class Individual extends Thread{
         new Thread(this).start();
     }
 
-
     public int getFitness() {
         return this.fitness;
     }
+
     public int type_converter(Intersection i){
         switch (i){
             case BASIC -> {
