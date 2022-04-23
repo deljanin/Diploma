@@ -56,8 +56,8 @@ public class Individual extends Thread{
 
     private void randomize_intersection(){
         this.intersections_enum = new ArrayList<>();
+        Random r = new Random();
         for (int i = 0; i < individual_size; i++) {
-            Random r = new Random();
             this.intersections_enum.add(Intersection.values()[r.nextInt(Intersection.values().length)]);
         }
     }

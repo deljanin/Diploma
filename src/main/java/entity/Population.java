@@ -111,34 +111,34 @@ public class Population {
 
     public void mutate() {
         Random r = new Random();
-        Intersection[] tmp = new Intersection[Intersection.values().length - 1];
+        Intersection[] intersectionsWoutBASIC = makeIntersectionArrWoutSpecific(Intersection.BASIC);
+        Intersection[] intersectionsWoutSEMAPHORE = makeIntersectionArrWoutSpecific(Intersection.SEMAPHORE);
+        Intersection[] intersectionsWoutROUNDABOUT = makeIntersectionArrWoutSpecific(Intersection.ROUNDABOUT);
         for (int i = 0; i < population.size(); i++) {
             for (int j = 0; j < individual_size; j++) {
-                for (int z = 0; z < Intersection.values().length; z++) {
-                    if (tmp[z] != population.get(i).getIntersections_enum().get(j)) tmp[z] = Intersection.values()[z];
-                }
-                if(ThreadLocalRandom.current().nextInt(0,100)<=10) population.get(i).getIntersections_enum().set(j,tmp[r.nextInt(tmp.length)]);
-            }
-        }
-
-        /*for (Individual I: population) {
-            for (int j = 0; j < individual_size; j++) {
-                if (I.getData().charAt(j) != TARGET.charAt(j)){
-                    //System.out.println(I.getData());
-                    int randomNum = ThreadLocalRandom.current().nextInt(0,100);
-                    if (randomNum < 1) {
-                        int randomNum2 = ThreadLocalRandom.current().nextInt(0,ALPHABET.length());
-                        char[] temp =  I.getData().toCharArray();
-                        temp[j] = ALPHABET.charAt(randomNum2);
-                        StringBuilder sb = new StringBuilder();
-                        for (int i = 0; i < temp.length; i++) {
-                            sb.append(temp[i]);
+                if(ThreadLocalRandom.current().nextInt(0,100)<=10) {
+                    switch (population.get(i).getIntersections_enum().get(j)){
+                        case BASIC:{
+                            population.get(i).getIntersections_enum().set(j,intersectionsWoutBASIC[r.nextInt(intersectionsWoutBASIC.length)]);
                         }
-                        I.setData(sb.toString());
+                        case SEMAPHORE:{
+                            population.get(i).getIntersections_enum().set(j,intersectionsWoutSEMAPHORE[r.nextInt(intersectionsWoutSEMAPHORE.length)]);
+                        }
+                        case ROUNDABOUT:{
+                            population.get(i).getIntersections_enum().set(j,intersectionsWoutROUNDABOUT[r.nextInt(intersectionsWoutROUNDABOUT.length)]);
+                        }
                     }
                 }
             }
-        }*/
+        }
+    }
+
+    private Intersection[] makeIntersectionArrWoutSpecific(Intersection i){
+        ArrayList<Intersection> tmp = new ArrayList<>();
+        for (int z = 0; z < Intersection.values().length; z++) {
+            if (Intersection.values()[z] != i) tmp.add(Intersection.values()[z]);
+        }
+        return tmp.toArray(new Intersection[0]);
     }
 
     public List<IntersectionData> loadIntersections(){
