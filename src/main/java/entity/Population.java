@@ -13,6 +13,7 @@ import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 public class Population {
@@ -108,26 +109,37 @@ public class Population {
         startGeneration();
     }
 
-//    public void mutate() {
-//        for (Individual I: population) {
-//            for (int j = 0; j < individual_size; j++) {
-//                if (I.getData().charAt(j) != TARGET.charAt(j)){
-//                    //System.out.println(I.getData());
-//                    int randomNum = ThreadLocalRandom.current().nextInt(0,100);
-//                    if (randomNum < 1) {
-//                        int randomNum2 = ThreadLocalRandom.current().nextInt(0,ALPHABET.length());
-//                        char[] temp =  I.getData().toCharArray();
-//                        temp[j] = ALPHABET.charAt(randomNum2);
-//                        StringBuilder sb = new StringBuilder();
-//                        for (int i = 0; i < temp.length; i++) {
-//                            sb.append(temp[i]);
-//                        }
-//                        I.setData(sb.toString());
-//                    }
-//                }
-//            }
-//        }
-//    }
+    public void mutate() {
+        Random r = new Random();
+        Intersection[] tmp = new Intersection[Intersection.values().length - 1];
+        for (int i = 0; i < population.size(); i++) {
+            for (int j = 0; j < individual_size; j++) {
+                for (int z = 0; z < Intersection.values().length; z++) {
+                    if (tmp[z] != population.get(i).getIntersections_enum().get(j)) tmp[z] = Intersection.values()[z];
+                }
+                if(ThreadLocalRandom.current().nextInt(0,100)<=10) population.get(i).getIntersections_enum().set(j,tmp[r.nextInt(tmp.length)]);
+            }
+        }
+
+        /*for (Individual I: population) {
+            for (int j = 0; j < individual_size; j++) {
+                if (I.getData().charAt(j) != TARGET.charAt(j)){
+                    //System.out.println(I.getData());
+                    int randomNum = ThreadLocalRandom.current().nextInt(0,100);
+                    if (randomNum < 1) {
+                        int randomNum2 = ThreadLocalRandom.current().nextInt(0,ALPHABET.length());
+                        char[] temp =  I.getData().toCharArray();
+                        temp[j] = ALPHABET.charAt(randomNum2);
+                        StringBuilder sb = new StringBuilder();
+                        for (int i = 0; i < temp.length; i++) {
+                            sb.append(temp[i]);
+                        }
+                        I.setData(sb.toString());
+                    }
+                }
+            }
+        }*/
+    }
 
     public List<IntersectionData> loadIntersections(){
         Type listType = new TypeToken<ArrayList<IntersectionData>>() {}.getType();
@@ -140,4 +152,7 @@ public class Population {
         return new Gson().fromJson(reader, listType);
     }
 
+    public Vector<Individual> getPopulation() {
+        return population;
+    }
 }

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 public class Individual extends Thread{
-    ArrayList<Intersection> intersections_enum;
+    private ArrayList<Intersection> intersections_enum;
     private int fitness;
     private final int individual_size;
     private String individual_name;
