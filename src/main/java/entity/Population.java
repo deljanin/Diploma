@@ -21,6 +21,7 @@ public class Population {
     private int generation_size = 4;
     private List<IntersectionData> intersectionsData;
     private int individual_size;
+    private String separator = System.getProperty("file.separator");
 
     public Population(int generation_size) {
         this.generation_size = generation_size;
@@ -32,8 +33,8 @@ public class Population {
         population.forEach(Individual::start);
     }
 
-    public void initializeGeneration(String generation_name) {
-        File generation_folder = new File("generations\\"+generation_name);
+    public void initialiseGeneration(String generation_name) {
+        File generation_folder = new File("generations"+separator+generation_name);
 
 //TODO Check this auto remove!!
 
@@ -56,7 +57,7 @@ public class Population {
         }else{
             for (int i = 0; i < generation_size; i++) {
                 population.get(i).setIndividual_name(generation_name +"_"+i);
-                population.get(i).setGeneration_folder("generations\\" + generation_name);
+                population.get(i).setGeneration_folder("generations"+separator + generation_name);
             }
             population.forEach(Individual::initialise);
         }
@@ -94,7 +95,6 @@ public class Population {
     public void newGeneration(String generation_name) {
         Vector<Individual> newGen = new Vector<>(population.size());
         Collections.sort(population, new IndividualComparator());
-        Collections.reverse(population);
         for (int i = 0; i < population.size()/2; i=i+2) {
             Tuple t = crossover(population.get(i), population.get(i+1));
             newGen.add(t.getFirst());
@@ -105,18 +105,18 @@ public class Population {
     }
 
     public void calculateFitness(String generation_name){
-        initializeGeneration(generation_name);
-        startGeneration();
+        initialiseGeneration(generation_name);
+
     }
 
-    public void mutate() {
+    public void mutate(int mutation_chance) {
         Random r = new Random();
         Intersection[] intersectionsWoutBASIC = makeIntersectionArrWoutSpecific(Intersection.BASIC);
         Intersection[] intersectionsWoutSEMAPHORE = makeIntersectionArrWoutSpecific(Intersection.SEMAPHORE);
         Intersection[] intersectionsWoutROUNDABOUT = makeIntersectionArrWoutSpecific(Intersection.ROUNDABOUT);
         for (int i = 0; i < population.size(); i++) {
             for (int j = 0; j < individual_size; j++) {
-                if(ThreadLocalRandom.current().nextInt(0,100)<=10) {
+                if(ThreadLocalRandom.current().nextInt(0,100)<=mutation_chance) {
                     switch (population.get(i).getIntersections_enum().get(j)){
                         case BASIC:{
                             population.get(i).getIntersections_enum().set(j,intersectionsWoutBASIC[r.nextInt(intersectionsWoutBASIC.length)]);

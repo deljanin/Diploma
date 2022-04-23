@@ -21,6 +21,7 @@ public class Individual extends Thread{
     private ArrayList<IntersectionData> intersectionsData_individual_copy;
     private String individual_intersectionsJson_path;
     private String generation_folder;
+    String separator = System.getProperty("file.separator");
 
     public Individual(int individual_size, String individual_name, List<IntersectionData> intersectionsData, String generation_folder){
         this.individual_size = individual_size;
@@ -39,7 +40,7 @@ public class Individual extends Thread{
         this.intersections_enum = intersections_enum;
     }
     public void initialise() {
-        File individual_folder = new File(generation_folder + "\\" + individual_name + "\\");
+        File individual_folder = new File(generation_folder + separator + individual_name + separator);
         if(!individual_folder.mkdir()) System.out.println("Failed to create individual folder");
 
         for (int i = 0; i < intersectionsData_individual_copy.size(); i++) {
@@ -47,7 +48,7 @@ public class Individual extends Thread{
         }
 
         try {
-            individual_intersectionsJson_path = individual_folder+"\\intersections.json";
+            individual_intersectionsJson_path = individual_folder+ separator +"intersections.json";
             Files.writeString(Path.of(individual_intersectionsJson_path),new Gson().toJson(intersectionsData_individual_copy));
         } catch (IOException e) {
             e.printStackTrace();
@@ -65,14 +66,14 @@ public class Individual extends Thread{
     @Override
     public void run() {
         String path = System.getProperty("user.dir");
-        String separator = System.getProperty("file.separator");
+
         ProcessBuilder builder;
         if (System.getProperty("os.name").startsWith("Windows")) {
             builder = new ProcessBuilder(
-                    "cmd.exe", "/c", "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false config.json ..\\" + individual_intersectionsJson_path);
+                    "cmd.exe", "/c", "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false config.json .."+separator + individual_intersectionsJson_path);
         } else {
             builder = new ProcessBuilder(
-                    "bash", "-c", "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false config.json ../" + individual_intersectionsJson_path);
+                    "bash", "-c", "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false config.json .."+ separator + individual_intersectionsJson_path);
         }
         builder.redirectErrorStream(true);
         Process p = null;
@@ -91,6 +92,7 @@ public class Individual extends Thread{
     public void start(){
         new Thread(this).start();
     }
+
 
     public int getFitness() {
         return this.fitness;
@@ -124,11 +126,5 @@ public class Individual extends Thread{
         this.generation_folder = generation_folder;
     }
 
-    @Override
-    public String toString() {
-        return "Individual{" +
-                "individual_name='" + individual_name + '\'' +
-                ", generation_folder='" + generation_folder + '\'' +
-                '}';
-    }
+
 }
