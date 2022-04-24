@@ -3,6 +3,7 @@ package entity;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
+import data.ConfigData;
 import data.IntersectionData;
 
 import java.io.File;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -20,13 +22,19 @@ public class Population {
     private Vector<Individual> population = null;
     private int generation_size = 4;
     private List<IntersectionData> intersectionsData;
+    private ConfigData configData;
+    private ConfigData configData_generation_copy;
     private int individual_size;
     private String separator = System.getProperty("file.separator");
     private int generation_count;
+    private String generation_configJson_path;
 
     public Population(int generation_size) {
         this.generation_size = generation_size;
         this.intersectionsData = loadIntersections();
+        this.configData = loadConfig();
+//TODO I hope this constructor of ConfigData makes a deep copy of configData
+        this.configData_generation_copy = new ConfigData(configData);
         this.individual_size = intersectionsData.size();
         this.generation_count = 0;
     }
@@ -45,17 +53,27 @@ public class Population {
             e.printStackTrace();
         }
 
-
         if(!generation_folder.mkdir()) System.out.println("Failed to create generation folder");
+
+//      TODO Here you can change the parameters of the generations config file:
+//      configData_generation_copy.numberOfVehicles = 123;
+        this.generation_configJson_path = generation_folder+separator+"config.json";
+        try {
+            Files.writeString(Path.of(generation_configJson_path),new Gson().toJson(configData_generation_copy));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         if(population == null) {
             population = new Vector<>();
             for (int i = 0; i < generation_size; i++) {
-                population.add(new Individual(individual_size, generation_count + "_" + i, intersectionsData, generation_folder.toString()));
+                population.add(new Individual(individual_size, generation_count + "_" + i, intersectionsData, generation_folder.toString(), generation_configJson_path));
             }
         }else{
             for (int i = 0; i < generation_size; i++) {
                 population.get(i).setIndividual_name(generation_count +"_"+i);
                 population.get(i).setGeneration_folder("generations"+separator + generation_count);
+                population.get(i).setGeneration_configJson_path(generation_configJson_path);
             }
             population.forEach(Individual::initialise);
         }
@@ -144,6 +162,16 @@ public class Population {
             e.printStackTrace();
         }
         return new Gson().fromJson(reader, listType);
+    }
+
+    public ConfigData loadConfig(){
+        ConfigData config = null;
+        try {
+            config = new Gson().fromJson(Files.readString(Paths.get("simulator/config.json")), ConfigData.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return config;
     }
 
     public Vector<Individual> getPopulation() {

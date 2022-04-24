@@ -20,14 +20,16 @@ public class Individual extends Thread{
     private String individual_name;
     private ArrayList<IntersectionData> intersectionsData_individual_copy;
     private String individual_intersectionsJson_path;
+    private String generation_configJson_path;
     private String generation_folder;
     String separator = System.getProperty("file.separator");
 
-    public Individual(int individual_size, String individual_name, List<IntersectionData> intersectionsData, String generation_folder){
+    public Individual(int individual_size, String individual_name, List<IntersectionData> intersectionsData, String generation_folder, String generation_configJson_path){
         this.individual_size = individual_size;
         this.intersectionsData_individual_copy = new ArrayList<>(List.copyOf(intersectionsData));
         this.individual_name = individual_name;
         this.generation_folder = generation_folder;
+        this.generation_configJson_path = generation_configJson_path;
         randomize_intersection();
         initialise();
     }
@@ -71,10 +73,10 @@ public class Individual extends Thread{
         ProcessBuilder builder;
         if (System.getProperty("os.name").startsWith("Windows")) {
             builder = new ProcessBuilder(
-                    "cmd.exe", "/c", "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false config.json .."+separator + individual_intersectionsJson_path);
+                    "cmd.exe", "/c", "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false .." + separator + this.generation_configJson_path  + " .." + separator + individual_intersectionsJson_path);
         } else {
             builder = new ProcessBuilder(
-                    "bash", "-c", "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false config.json .."+ separator + individual_intersectionsJson_path);
+                    "bash", "-c", "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false config.json .." + separator + this.generation_configJson_path  + " .." + separator + individual_intersectionsJson_path);
         }
         builder.redirectErrorStream(true);
         Process p = null;
@@ -127,5 +129,7 @@ public class Individual extends Thread{
         this.generation_folder = generation_folder;
     }
 
-
+    public void setGeneration_configJson_path(String generation_configJson_path) {
+        this.generation_configJson_path = generation_configJson_path;
+    }
 }
