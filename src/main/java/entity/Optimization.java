@@ -26,9 +26,13 @@ public class Optimization {
 //      TODO needs loop {
         population.initialiseGeneration();
 //        population.getPopulation().forEach(executorService::execute);
+//        TESTING:
         population.getPopulation().forEach(i -> i.start());
-        ga.crossover(population);
-        ga.mutate(population, 10);
+        System.out.println(population.getPopulation().get(0).getIntersections_enum());
+        this.population = ga.crossover(population);
+        System.out.println(population.getPopulation().get(0).getIntersections_enum());
+        this.population = ga.mutate(population, 10);
+        System.out.println(population.getPopulation().get(0).getIntersections_enum());
 //        population.crossover();
 //        population.mutate(10);
 //TODO  }

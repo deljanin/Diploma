@@ -83,7 +83,6 @@ public class GenericGA extends GA{
                 }
             }
         }
-        System.out.println("IT work");
         return new Population(pop.getPopulation().size(), pop.getIntersectionsData(), pop.getConfigData() ,mutatedPopulation);
     }
 
