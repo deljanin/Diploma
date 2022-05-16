@@ -26,19 +26,27 @@ public class Population {
     private ConfigData configData_generation_copy;
     private int individual_size;
     private String separator = System.getProperty("file.separator");
-    private int generation_count;
     private String generation_configJson_path;
+    int generation_count = 0;
 
     public Population(int generation_size) {
         this.generation_size = generation_size;
         this.intersectionsData = loadIntersections();
         this.configData = loadConfig();
-//TODO I hope this constructor of ConfigData makes a deep copy of configData
         this.configData_generation_copy = new ConfigData(configData);
         this.individual_size = intersectionsData.size();
-        this.generation_count = 0;
     }
 
+    public Population(int generation_size, List<IntersectionData> intersectionsData, ConfigData configData,Vector<Individual> population){
+        this.generation_size = generation_size;
+        this.intersectionsData = intersectionsData;
+        this.configData = configData;
+        this.configData_generation_copy = new ConfigData(configData);
+        this.individual_size = intersectionsData.size();
+        this.population = population;
+    }
+
+//TODO This method writes to disk, so I should move it to Optimization class?
     public void initialiseGeneration() {
         File generation_folder = new File("generations"+separator+generation_count);
 
@@ -56,7 +64,8 @@ public class Population {
         if(!generation_folder.mkdir()) System.out.println("Failed to create generation folder");
 
 //      TODO Here you can change the parameters of the generations config file:
-//      configData_generation_copy.numberOfVehicles = 123;
+//      configData_generation_copy.numberOfVehicles = 100;
+//      configData_generation_copy.simulationSpeed = 1;
         this.generation_configJson_path = generation_folder+separator+"config.json";
         try {
             Files.writeString(Path.of(generation_configJson_path),new Gson().toJson(configData_generation_copy));
@@ -72,7 +81,7 @@ public class Population {
         }else{
             for (int i = 0; i < generation_size; i++) {
                 population.get(i).setIndividual_name(generation_count +"_"+i);
-                population.get(i).setGeneration_folder("generations"+separator + generation_count);
+                population.get(i).setGeneration_folder("generations" + separator + generation_count);
                 population.get(i).setGeneration_configJson_path(generation_configJson_path);
             }
             population.forEach(Individual::initialise);
@@ -80,7 +89,10 @@ public class Population {
         this.generation_count++;
     }
 
-    private Tuple crossover(Individual individual1, Individual individual2){
+
+
+
+    private Tuple crossoverPair(Individual individual1, Individual individual2){
         int end = individual1.getIntersections_enum().size();
         int half = end/2;
         List<Intersection> individual1_firstHalf = individual1.getIntersections_enum().subList(0,half);
@@ -108,18 +120,17 @@ public class Population {
                 ));
     }
 
-    public void newGeneration() {
+    public void crossover() {
         Vector<Individual> newGen = new Vector<>(population.size());
         Collections.sort(population, new IndividualComparator());
         for (int i = 0; i < population.size()/2; i=i+2) {
-            Tuple t = crossover(population.get(i), population.get(i+1));
+            Tuple t = crossoverPair(population.get(i), population.get(i+1));
             newGen.add(t.getFirst());
             newGen.add(t.getSecond());
         }
         newGen.addAll(population.subList(0,population.size()/2));
         this.population = newGen;
     }
-
 
     public void mutate(int mutation_chance) {
         Random r = new Random();
@@ -174,7 +185,38 @@ public class Population {
         return config;
     }
 
+
+
+
+
+
+
+
+
+
+//    Getters & Setters
+
     public Vector<Individual> getPopulation() {
         return population;
+    }
+
+    public List<IntersectionData> getIntersectionsData() {
+        return intersectionsData;
+    }
+
+    public int getGeneration_size() {
+        return generation_size;
+    }
+
+    public ConfigData getConfigData() {
+        return configData;
+    }
+
+    public int getIndividual_size() {
+        return individual_size;
+    }
+
+    public String getSeparator() {
+        return separator;
     }
 }

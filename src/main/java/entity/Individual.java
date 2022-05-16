@@ -73,10 +73,10 @@ public class Individual extends Thread{
         ProcessBuilder builder;
         if (System.getProperty("os.name").startsWith("Windows")) {
             builder = new ProcessBuilder(
-                    "cmd.exe", "/c", "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false .." + separator + this.generation_configJson_path  + " .." + separator + individual_intersectionsJson_path);
+                    "cmd.exe", "/c", "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false .." + separator + generation_configJson_path  + " .." + separator + individual_intersectionsJson_path);
         } else {
             builder = new ProcessBuilder(
-                    "bash", "-c", "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false config.json .." + separator + this.generation_configJson_path  + " .." + separator + individual_intersectionsJson_path);
+                    "bash", "-c", "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false config.json .." + separator + generation_configJson_path  + " .." + separator + individual_intersectionsJson_path);
         }
         builder.redirectErrorStream(true);
         Process p = null;
