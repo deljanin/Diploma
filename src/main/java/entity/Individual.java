@@ -12,6 +12,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 public class Individual extends Thread{
     private ArrayList<Intersection> intersections_enum;
@@ -23,6 +25,7 @@ public class Individual extends Thread{
     private String generation_configJson_path;
     private String generation_folder;
     String separator = System.getProperty("file.separator");
+    private CyclicBarrier cyclicBarrier;
 
     public Individual(int individual_size, String individual_name, List<IntersectionData> intersectionsData, String generation_folder, String generation_configJson_path){
         this.individual_size = individual_size;
@@ -68,6 +71,7 @@ public class Individual extends Thread{
 
     @Override
     public void run() {
+        System.out.println(this.getName()+ " started");
         String path = System.getProperty("user.dir");
 
         ProcessBuilder builder;
@@ -90,6 +94,13 @@ public class Individual extends Thread{
         }
         this.fitness = Integer.parseInt(out);
         System.out.println(individual_name+" Simulation ticks: " + fitness);
+        try {
+            this.cyclicBarrier.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (BrokenBarrierException e) {
+            e.printStackTrace();
+        }
     }
 
     public void start(){
@@ -131,5 +142,9 @@ public class Individual extends Thread{
 
     public void setGeneration_configJson_path(String generation_configJson_path) {
         this.generation_configJson_path = generation_configJson_path;
+    }
+
+    public void setCyclicBarrier(CyclicBarrier cyclicBarrier) {
+        this.cyclicBarrier = cyclicBarrier;
     }
 }

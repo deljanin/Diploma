@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ThreadLocalRandom;
 
 
@@ -47,7 +48,7 @@ public class Population {
     }
 
 //TODO This method writes to disk, so I should move it to Optimization class?
-    public void initialiseGeneration() {
+    public void initialiseGeneration(CyclicBarrier cyclicBarrier) {
         File generation_folder = new File("generations"+separator+generation_count);
 
 //TODO Check this auto remove!!
@@ -86,6 +87,7 @@ public class Population {
             }
             population.forEach(Individual::initialise);
         }
+        population.forEach(individual -> individual.setCyclicBarrier(cyclicBarrier));
         this.generation_count++;
     }
 
