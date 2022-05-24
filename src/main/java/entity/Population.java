@@ -48,11 +48,11 @@ public class Population {
     }
 
 //TODO This method writes to disk, so I should move it to Optimization class?
-    public void initialiseGeneration(CyclicBarrier cyclicBarrier) {
+    public void initialiseGeneration() {
         File generation_folder = new File("generations"+separator+generation_count);
 
 //TODO Check this auto remove!!
-
+/*
         try {
             Files.walk(generation_folder.toPath())
                     .sorted(Comparator.reverseOrder())
@@ -60,13 +60,13 @@ public class Population {
                     .forEach(File::delete);
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
         if(!generation_folder.mkdir()) System.out.println("Failed to create generation folder");
 
 //      TODO Here you can change the parameters of the generations config file:
-//      configData_generation_copy.numberOfVehicles = 100;
-//      configData_generation_copy.simulationSpeed = 1;
+        configData_generation_copy.numberOfVehicles = 1000;
+        configData_generation_copy.simulationSpeed = 1;
         this.generation_configJson_path = generation_folder+separator+"config.json";
         try {
             Files.writeString(Path.of(generation_configJson_path),new Gson().toJson(configData_generation_copy));
@@ -87,7 +87,7 @@ public class Population {
             }
             population.forEach(Individual::initialise);
         }
-        population.forEach(individual -> individual.setCyclicBarrier(cyclicBarrier));
+
         this.generation_count++;
     }
 

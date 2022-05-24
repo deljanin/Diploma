@@ -38,7 +38,7 @@ public class GenericGA extends GA{
     }
     @Override
     public Population crossover(Population pop) {
-        Vector<Individual> newGen = new Vector<>(pop.getPopulation().size());
+        Vector<Individual> newGen = new Vector<>(pop.getPopulation().size()); //TODO:move to selection
         Collections.sort(pop.getPopulation(), new IndividualComparator());
         for (int i = 0; i < pop.getPopulation().size()/2; i=i+2) {
             Tuple t = crossoverPair(pop.getPopulation().get(i), pop.getPopulation().get(i+1), pop);
@@ -89,7 +89,6 @@ public class GenericGA extends GA{
 //    TODO What is select supposed to do?
     @Override
     public Population select(Population population) {
-
         return null;
     }
 }

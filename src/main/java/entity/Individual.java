@@ -25,7 +25,6 @@ public class Individual extends Thread{
     private String generation_configJson_path;
     private String generation_folder;
     String separator = System.getProperty("file.separator");
-    private CyclicBarrier cyclicBarrier;
 
     public Individual(int individual_size, String individual_name, List<IntersectionData> intersectionsData, String generation_folder, String generation_configJson_path){
         this.individual_size = individual_size;
@@ -80,7 +79,7 @@ public class Individual extends Thread{
                     "cmd.exe", "/c", "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false .." + separator + generation_configJson_path  + " .." + separator + individual_intersectionsJson_path);
         } else {
             builder = new ProcessBuilder(
-                    "bash", "-c", "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false config.json .." + separator + generation_configJson_path  + " .." + separator + individual_intersectionsJson_path);
+                    "bash", "-c", "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false .." + separator + generation_configJson_path  + " .." + separator + individual_intersectionsJson_path);
         }
         builder.redirectErrorStream(true);
         Process p = null;
@@ -94,13 +93,6 @@ public class Individual extends Thread{
         }
         this.fitness = Integer.parseInt(out);
         System.out.println(individual_name+" Simulation ticks: " + fitness);
-        try {
-            this.cyclicBarrier.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (BrokenBarrierException e) {
-            e.printStackTrace();
-        }
     }
 
     public void start(){
@@ -144,7 +136,6 @@ public class Individual extends Thread{
         this.generation_configJson_path = generation_configJson_path;
     }
 
-    public void setCyclicBarrier(CyclicBarrier cyclicBarrier) {
-        this.cyclicBarrier = cyclicBarrier;
+    public void setCyclicBarrier( ) {
     }
 }
