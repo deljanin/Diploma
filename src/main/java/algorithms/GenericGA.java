@@ -26,14 +26,13 @@ public class GenericGA extends GA{
                 new Individual(pop.getIntersectionsData().size(),
                         "ToBeSet",
                         pop.getIntersectionsData(),
-                        indi1,
-                        "ToBeSet"),
+                        indi1
+                        ),
 
                 new Individual(pop.getIntersectionsData().size(),
                         "ToBeSet",
                         pop.getIntersectionsData(),
-                        indi2,
-                        "ToBeSet"
+                        indi2
                 ));
     }
     @Override
@@ -47,7 +46,7 @@ public class GenericGA extends GA{
         }
         newGen.addAll(pop.getPopulation().subList(0,pop.getPopulation().size()/2));
 //        newGen.forEach(i -> System.out.println(i.getIntersections_enum()));
-        return new Population(pop.getGeneration_size(),pop.getIntersectionsData(), pop.getConfigData(), newGen);
+        return new Population(pop.getPopulation_size(),pop.getIntersectionsData(), pop.getConfigData(), newGen);
     }
 
     private Intersection[] makeIntersectionArrWoutSpecific(Intersection i){

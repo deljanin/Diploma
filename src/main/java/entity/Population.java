@@ -4,42 +4,35 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import data.ConfigData;
+import data.DataWriter;
 import data.IntersectionData;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ThreadLocalRandom;
 
 
 public class Population {
     private Vector<Individual> population = null;
-    private int generation_size = 4;
+    private int population_size = 4;
     private List<IntersectionData> intersectionsData;
     private ConfigData configData;
     private ConfigData configData_generation_copy;
     private int individual_size;
-    private String separator = System.getProperty("file.separator");
     private String generation_configJson_path;
     int generation_count = 0;
 
-    public Population(int generation_size) {
-        this.generation_size = generation_size;
+    public Population(int population_size) {
+        this.population_size = population_size;
         this.intersectionsData = loadIntersections();
         this.configData = loadConfig();
         this.configData_generation_copy = new ConfigData(configData);
         this.individual_size = intersectionsData.size();
     }
 
-    public Population(int generation_size, List<IntersectionData> intersectionsData, ConfigData configData,Vector<Individual> population){
-        this.generation_size = generation_size;
+    public Population(int population_size, List<IntersectionData> intersectionsData, ConfigData configData,Vector<Individual> population){
+        this.population_size = population_size;
         this.intersectionsData = intersectionsData;
         this.configData = configData;
         this.configData_generation_copy = new ConfigData(configData);
@@ -49,50 +42,24 @@ public class Population {
 
 //TODO This method writes to disk, so I should move it to Optimization class?
     public void initialiseGeneration() {
-        File generation_folder = new File("generations"+separator+generation_count);
-
-//TODO Check this auto remove!!
-/*
-        try {
-            Files.walk(generation_folder.toPath())
-                    .sorted(Comparator.reverseOrder())
-                    .map(Path::toFile)
-                    .forEach(File::delete);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-
-        if(!generation_folder.mkdir()) System.out.println("Failed to create generation folder");
-
-//      TODO Here you can change the parameters of the generations config file:
-        configData_generation_copy.numberOfVehicles = 1000;
-        configData_generation_copy.simulationSpeed = 1;
-        this.generation_configJson_path = generation_folder+separator+"config.json";
-        try {
-            Files.writeString(Path.of(generation_configJson_path),new Gson().toJson(configData_generation_copy));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        DataWriter dataWriter = new DataWriter(generation_count);
+        dataWriter.population_write(new Gson().toJson(configData_generation_copy));
+        generation_configJson_path = "generations" + System.getProperty("file.separator") + generation_count;
         if(population == null) {
             population = new Vector<>();
-            for (int i = 0; i < generation_size; i++) {
-                population.add(new Individual(individual_size, generation_count + "_" + i, intersectionsData, generation_folder.toString(), generation_configJson_path));
+            for (int i = 0; i < population_size; i++) {
+                population.add(new Individual(individual_size, generation_count + "_" + i, intersectionsData,  generation_configJson_path));
             }
         }else{
-            for (int i = 0; i < generation_size; i++) {
+            for (int i = 0; i < population_size; i++) {
                 population.get(i).setIndividual_name(generation_count +"_"+i);
-                population.get(i).setGeneration_folder("generations" + separator + generation_count);
                 population.get(i).setGeneration_configJson_path(generation_configJson_path);
             }
-            population.forEach(Individual::initialise);
         }
-
+        population.forEach(Individual::initialise);
+        population.forEach(i -> dataWriter.individual_write(i.getIndividual_name(),new Gson().toJson(i.getIntersectionsData_individual_copy())));
         this.generation_count++;
     }
-
-
-
 
     private Tuple crossoverPair(Individual individual1, Individual individual2){
         int end = individual1.getIntersections_enum().size();
@@ -111,14 +78,14 @@ public class Population {
                 new Individual(individual_size,
                 "ToBeSet",
                         intersectionsData,
-                        indi1,
-                "ToBeSet"),
+                        indi1
+                ),
 
                 new Individual(individual_size,
                         "ToBeSet",
                         intersectionsData,
-                        indi2,
-                        "ToBeSet"
+                        indi2
+
                 ));
     }
 
@@ -177,24 +144,39 @@ public class Population {
         return new Gson().fromJson(reader, listType);
     }
 
-    public ConfigData loadConfig(){
+    public ConfigData loadConfig() {
         ConfigData config = null;
+        FileReader fileReader = null;
         try {
-            config = new Gson().fromJson(Files.readString(Paths.get("simulator/config.json")), ConfigData.class);
+            fileReader = new FileReader("simulator/config.json");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        StringBuilder resultStringBuilder = new StringBuilder();
+        BufferedReader br = new BufferedReader(fileReader);
+        String line;
+        try {
+            while ((line = br.readLine()) != null) {
+                resultStringBuilder.append(line).append("\n");
+            }
+            br.close();
+            fileReader.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
+        config = new Gson().fromJson(resultStringBuilder.toString(), ConfigData.class);
+
+//        try{
+//
+////            config = new Gson().fromJson(Files.readString(Paths.get("simulator/config.json")), ConfigData.class);
+//            } catch(IOException e)
+//            {
+//                e.printStackTrace();
+//            }
         return config;
     }
-
-
-
-
-
-
-
-
-
 
 //    Getters & Setters
 
@@ -206,8 +188,8 @@ public class Population {
         return intersectionsData;
     }
 
-    public int getGeneration_size() {
-        return generation_size;
+    public int getPopulation_size() {
+        return population_size;
     }
 
     public ConfigData getConfigData() {
@@ -218,7 +200,4 @@ public class Population {
         return individual_size;
     }
 
-    public String getSeparator() {
-        return separator;
-    }
 }
