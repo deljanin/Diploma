@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class DataWriter {
     private FileWriter fileWriter;
@@ -17,7 +18,7 @@ public class DataWriter {
         generation_folder = new File("generations" + separator + generation_count);
     }
 
-    public void population_write(String data){
+    public void population_write(ConfigData data){
         File generation_folder = new File("generations" + separator + generation_count);
         if(!generation_folder.mkdir()) System.out.println("Failed to create generation folder");
         try {
@@ -30,7 +31,7 @@ public class DataWriter {
 
 
     }
-    public void individual_write(String individual_name, String data){
+    public void individual_write(String individual_name, ArrayList<IntersectionData> data){
         File individual_folder = new File(generation_folder + separator + individual_name + separator);
         if(!individual_folder.mkdir()) System.out.println("Failed to create individual folder");
 

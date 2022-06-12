@@ -29,28 +29,27 @@ public class Optimization  {
 //        In every iteration calls the 3 methods from GA algorithm
 //        Returns modified population at the end
 
-//        ExecutorService executorService = Executors.newFixedThreadPool(parties);
-//
-//        for (int i = 0; i< stopCondition; i++) {
-//            population.initialiseGeneration();
-//
-//            List<Callable<Object>> callables = new ArrayList<>();
-//            for (Individual individual: population.getPopulation()){
-//                callables.add(Executors.callable(individual));
-//            }
-//            try {
-//                List<Future<Object>> futures = executorService.invokeAll(callables);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//            System.out.println("Population ended.");
-//        }
+        ExecutorService executorService = Executors.newFixedThreadPool(parties);
 
-//      TODO needs loop {
+        for (int i = 0; i< stopCondition; i++) {
+            population.initialiseGeneration();
+
+            List<Callable<Object>> callables = new ArrayList<>();
+            for (Individual individual: population.getPopulation()){
+                callables.add(Executors.callable(individual));
+            }
+            try {
+                List<Future<Object>> futures = executorService.invokeAll(callables);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("Population ended.");
+        }
+
 
 //        TESTING:
-        population.initialiseGeneration();
-        population.getPopulation().forEach(i -> i.start());
+//        population.initialiseGeneration();
+//        population.getPopulation().forEach(i -> i.start());
 //        System.out.println(population.getPopulation().get(0).getIntersections_enum());
 //        this.population = ga.crossover(population);
 //        System.out.println(population.getPopulation().get(0).getIntersections_enum());
@@ -58,7 +57,6 @@ public class Optimization  {
 //        System.out.println(population.getPopulation().get(0).getIntersections_enum());
 //        population.crossover();
 //        population.mutate(10);
-//TODO  }
         return population;
     }
 }

@@ -40,10 +40,9 @@ public class Population {
         this.population = population;
     }
 
-//TODO This method writes to disk, so I should move it to Optimization class?
     public void initialiseGeneration() {
         DataWriter dataWriter = new DataWriter(generation_count);
-        dataWriter.population_write(new Gson().toJson(configData_generation_copy));
+        dataWriter.population_write(configData_generation_copy);
         generation_configJson_path = "generations" + System.getProperty("file.separator") + generation_count;
         if(population == null) {
             population = new Vector<>();
@@ -57,7 +56,7 @@ public class Population {
             }
         }
         population.forEach(Individual::initialise);
-        population.forEach(i -> dataWriter.individual_write(i.getIndividual_name(),new Gson().toJson(i.getIntersectionsData_individual_copy())));
+        population.forEach(i -> dataWriter.individual_write(i.getIndividual_name(),i.getIntersectionsData_individual_copy()));
         this.generation_count++;
     }
 

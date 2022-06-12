@@ -56,13 +56,12 @@ public class Individual extends Thread{
         System.out.println(this.getName()+ " started");
         String path = System.getProperty("user.dir");
         ProcessBuilder builder;
-        System.out.println("cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false .." + separator + generation_configJson_path  + " .." + separator + individual_intersectionsJson_path);
         if (System.getProperty("os.name").startsWith("Windows")) {
             builder = new ProcessBuilder(
-                    "cmd.exe", "/c", "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false .." + separator + generation_configJson_path  + " .." + separator + individual_intersectionsJson_path);
+                    "cmd.exe", "/c", "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false .." + separator + generation_configJson_path + separator + "config.json"  + " .." + separator + individual_intersectionsJson_path);
         } else {
             builder = new ProcessBuilder(
-                    "bash", "-c", "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false .." + separator + generation_configJson_path  + " .." + separator + individual_intersectionsJson_path);
+                    "bash", "-c", "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false .." + separator + generation_configJson_path + separator + "config.json" + " .." + separator + individual_intersectionsJson_path);
         }
         builder.redirectErrorStream(true);
         Process p = null;
