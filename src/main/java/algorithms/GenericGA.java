@@ -26,27 +26,27 @@ public class GenericGA extends GA{
                 new Individual(pop.getIntersectionsData().size(),
                         "ToBeSet",
                         pop.getIntersectionsData(),
-                        indi1
+                        indi1,
+                        individual1.getGeneration_configJson_path()
                         ),
 
                 new Individual(pop.getIntersectionsData().size(),
                         "ToBeSet",
                         pop.getIntersectionsData(),
-                        indi2
+                        indi2,
+                        individual1.getGeneration_configJson_path()
                 ));
     }
     @Override
     public Population crossover(Population pop) {
-        Vector<Individual> newGen = new Vector<>(pop.getPopulation().size()); //TODO:move to selection
-        Collections.sort(pop.getPopulation(), new IndividualComparator());
-        for (int i = 0; i < pop.getPopulation().size()/2; i=i+2) {
+        Vector<Individual> newGen = new Vector<>(pop.getPopulation().size());
+        for (int i = 0; i < pop.getPopulation().size(); i=i+2) {
             Tuple t = crossoverPair(pop.getPopulation().get(i), pop.getPopulation().get(i+1), pop);
             newGen.add(t.getFirst());
             newGen.add(t.getSecond());
         }
-        newGen.addAll(pop.getPopulation().subList(0,pop.getPopulation().size()/2));
-//        newGen.forEach(i -> System.out.println(i.getIntersections_enum()));
-        return new Population(pop.getPopulation_size(),pop.getIntersectionsData(), pop.getConfigData(), newGen);
+        newGen.addAll(pop.getPopulation().subList(0,pop.getPopulation().size()));
+        return new Population(pop.getPopulation_size(), pop.getIntersectionsData(), pop.getConfigData(), newGen, pop.getGeneration_count());
     }
 
     private Intersection[] makeIntersectionArrWoutSpecific(Intersection i){
@@ -56,6 +56,7 @@ public class GenericGA extends GA{
         }
         return tmp.toArray(new Intersection[0]);
     }
+
 
     @Override
     public Population mutate(Population pop, int mutation_chance) {
@@ -82,12 +83,15 @@ public class GenericGA extends GA{
                 }
             }
         }
-        return new Population(pop.getPopulation().size(), pop.getIntersectionsData(), pop.getConfigData() ,mutatedPopulation);
+        return new Population(pop.getPopulation().size(), pop.getIntersectionsData(), pop.getConfigData() ,mutatedPopulation, pop.getGeneration_count());
     }
 
-//    TODO What is select supposed to do?
+
     @Override
-    public Population select(Population population) {
-        return null;
+    public Population select(Population pop) { /*Selects HALF*/
+        Vector<Individual> newGen = new Vector<>(pop.getPopulation().size());
+        Collections.sort(pop.getPopulation(), new IndividualComparator());
+        newGen.addAll(pop.getPopulation().subList(0,pop.getPopulation().size()/2));
+        return new Population(pop.getPopulation_size(), pop.getIntersectionsData(), pop.getConfigData(), newGen, pop.getGeneration_count());
     }
 }

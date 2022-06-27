@@ -3,12 +3,10 @@ package data;
 public class ConfigData {
     public double simulationSpeed;
     public int seed;
-    public int numberOfVehicles;
 
     public ConfigData(ConfigData config){
         this.simulationSpeed = config.getSimulationSpeed();
         this.seed = config.getSeed();
-        this.numberOfVehicles = config.getNumberOfVehicles();
     }
 
     public double getSimulationSpeed() {
@@ -27,11 +25,4 @@ public class ConfigData {
         this.seed = seed;
     }
 
-    public int getNumberOfVehicles() {
-        return numberOfVehicles;
-    }
-
-    public void setNumberOfVehicles(int numberOfVehicles) {
-        this.numberOfVehicles = numberOfVehicles;
-    }
 }

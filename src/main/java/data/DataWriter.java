@@ -28,13 +28,10 @@ public class DataWriter {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
     public void individual_write(String individual_name, ArrayList<IntersectionData> data){
         File individual_folder = new File(generation_folder + separator + individual_name + separator);
         if(!individual_folder.mkdir()) System.out.println("Failed to create individual folder");
-
         try {
             fileWriter = new FileWriter(individual_folder + separator +"intersections.json");
             fileWriter.write(new Gson().toJson(data));
@@ -42,6 +39,5 @@ public class DataWriter {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 }

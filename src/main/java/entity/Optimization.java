@@ -23,7 +23,6 @@ public class Optimization  {
         this.generation_count = 0;
     }
 
-
     public Population Start(){
 //        Implements a barrier and loops until stop condition is met
 //        In every iteration calls the 3 methods from GA algorithm
@@ -44,12 +43,31 @@ public class Optimization  {
                 e.printStackTrace();
             }
             System.out.println("Population ended.");
-        }
 
+            System.out.println("Pop size: " + population.getPopulation().size());
+            this.population = ga.select(population);
+            System.out.println("Pop size: " + population.getPopulation().size());
+            this.population = ga.crossover(population);
+            System.out.println("Pop size: " + population.getPopulation().size());
+            this.population = ga.mutate(population, 10);
+
+
+//      TODO We need to remove individual files which were already executed and completed.
+
+
+
+        }
 
 //        TESTING:
 //        population.initialiseGeneration();
+//        System.out.println("Pop size: " + population.getPopulation().size());
+//        this.population = ga.select(population);
+//        System.out.println("Pop size: " + population.getPopulation().size());
+//        this.population = ga.crossover(population);
+//        System.out.println("Pop size: " + population.getPopulation().size());
+//        this.population = ga.mutate(population, 10);
 //        population.getPopulation().forEach(i -> i.start());
+
 //        System.out.println(population.getPopulation().get(0).getIntersections_enum());
 //        this.population = ga.crossover(population);
 //        System.out.println(population.getPopulation().get(0).getIntersections_enum());

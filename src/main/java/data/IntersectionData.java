@@ -12,6 +12,10 @@ public class IntersectionData {
         this.type = type;
     }
 
+    public int getType() {
+        return type;
+    }
+
     @Override
     public String toString() {
         return "IntersectionData{" +

@@ -1,2 +1,2 @@
-java -jar Simulator.jar true config.json ..\generations\Gen0\Gen0_1\intersections.json
+java -jar Simulator.jar true config.json ..\generations\0\0_0\intersections.json
 pause

@@ -21,7 +21,7 @@ public class Population {
     private ConfigData configData_generation_copy;
     private int individual_size;
     private String generation_configJson_path;
-    int generation_count = 0;
+    private int generation_count;
 
     public Population(int population_size) {
         this.population_size = population_size;
@@ -29,18 +29,22 @@ public class Population {
         this.configData = loadConfig();
         this.configData_generation_copy = new ConfigData(configData);
         this.individual_size = intersectionsData.size();
+        this.generation_count = 0;
     }
 
-    public Population(int population_size, List<IntersectionData> intersectionsData, ConfigData configData,Vector<Individual> population){
+    public Population(int population_size, List<IntersectionData> intersectionsData, ConfigData configData, Vector<Individual> population, int generation_count){
         this.population_size = population_size;
         this.intersectionsData = intersectionsData;
         this.configData = configData;
         this.configData_generation_copy = new ConfigData(configData);
         this.individual_size = intersectionsData.size();
         this.population = population;
+        this.generation_count = generation_count;
     }
 
     public void initialiseGeneration() {
+//      Here we can change the config data
+        configData_generation_copy.simulationSpeed = 1.0;
         DataWriter dataWriter = new DataWriter(generation_count);
         dataWriter.population_write(configData_generation_copy);
         generation_configJson_path = "generations" + System.getProperty("file.separator") + generation_count;
@@ -53,84 +57,26 @@ public class Population {
             for (int i = 0; i < population_size; i++) {
                 population.get(i).setIndividual_name(generation_count +"_"+i);
                 population.get(i).setGeneration_configJson_path(generation_configJson_path);
+                population.get(i).setIndividual_intersectionsJson_path();
             }
         }
+
+//        TODO Here we are changing the individual copies of the IntersectionsData
         population.forEach(Individual::initialise);
+        System.out.println();
+//        TODO Here they are not changed somehow?????
+
+        for (int i = 0; i < population.size(); i++) {
+            for (int j = 0; j < population.get(i).getIntersectionsData_individual_copy().size(); j++) {
+                System.out.print(population.get(i).getIntersectionsData_individual_copy().get(j).getType());
+            }
+            System.out.println();
+        }
+
         population.forEach(i -> dataWriter.individual_write(i.getIndividual_name(),i.getIntersectionsData_individual_copy()));
         this.generation_count++;
     }
 
-    private Tuple crossoverPair(Individual individual1, Individual individual2){
-        int end = individual1.getIntersections_enum().size();
-        int half = end/2;
-        List<Intersection> individual1_firstHalf = individual1.getIntersections_enum().subList(0,half);
-        List<Intersection> individual2_firstHalf = individual2.getIntersections_enum().subList(0,half);
-
-        List<Intersection> individual1_secondHalf = individual1.getIntersections_enum().subList(half,end);
-        List<Intersection> individual2_secondHalf = individual2.getIntersections_enum().subList(half,end);
-
-        ArrayList<Intersection> indi1 = new ArrayList<>(individual1_firstHalf);
-        indi1.addAll(individual2_secondHalf);
-        ArrayList<Intersection> indi2 = new ArrayList<>(individual2_firstHalf);
-        indi2.addAll(individual1_secondHalf);
-        return new Tuple(
-                new Individual(individual_size,
-                "ToBeSet",
-                        intersectionsData,
-                        indi1
-                ),
-
-                new Individual(individual_size,
-                        "ToBeSet",
-                        intersectionsData,
-                        indi2
-
-                ));
-    }
-
-    public void crossover() {
-        Vector<Individual> newGen = new Vector<>(population.size());
-        Collections.sort(population, new IndividualComparator());
-        for (int i = 0; i < population.size()/2; i=i+2) {
-            Tuple t = crossoverPair(population.get(i), population.get(i+1));
-            newGen.add(t.getFirst());
-            newGen.add(t.getSecond());
-        }
-        newGen.addAll(population.subList(0,population.size()/2));
-        this.population = newGen;
-    }
-
-    public void mutate(int mutation_chance) {
-        Random r = new Random();
-        Intersection[] intersectionsWoutBASIC = makeIntersectionArrWoutSpecific(Intersection.BASIC);
-        Intersection[] intersectionsWoutSEMAPHORE = makeIntersectionArrWoutSpecific(Intersection.SEMAPHORE);
-        Intersection[] intersectionsWoutROUNDABOUT = makeIntersectionArrWoutSpecific(Intersection.ROUNDABOUT);
-        for (int i = 0; i < population.size(); i++) {
-            for (int j = 0; j < individual_size; j++) {
-                if(ThreadLocalRandom.current().nextInt(0,100)<=mutation_chance) {
-                    switch (population.get(i).getIntersections_enum().get(j)){
-                        case BASIC:{
-                            population.get(i).getIntersections_enum().set(j,intersectionsWoutBASIC[r.nextInt(intersectionsWoutBASIC.length)]);
-                        }
-                        case SEMAPHORE:{
-                            population.get(i).getIntersections_enum().set(j,intersectionsWoutSEMAPHORE[r.nextInt(intersectionsWoutSEMAPHORE.length)]);
-                        }
-                        case ROUNDABOUT:{
-                            population.get(i).getIntersections_enum().set(j,intersectionsWoutROUNDABOUT[r.nextInt(intersectionsWoutROUNDABOUT.length)]);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private Intersection[] makeIntersectionArrWoutSpecific(Intersection i){
-        ArrayList<Intersection> tmp = new ArrayList<>();
-        for (int z = 0; z < Intersection.values().length; z++) {
-            if (Intersection.values()[z] != i) tmp.add(Intersection.values()[z]);
-        }
-        return tmp.toArray(new Intersection[0]);
-    }
 
     public List<IntersectionData> loadIntersections(){
         Type listType = new TypeToken<ArrayList<IntersectionData>>() {}.getType();
@@ -177,26 +123,22 @@ public class Population {
         return config;
     }
 
-//    Getters & Setters
-
     public Vector<Individual> getPopulation() {
         return population;
     }
-
     public List<IntersectionData> getIntersectionsData() {
         return intersectionsData;
     }
-
     public int getPopulation_size() {
         return population_size;
     }
-
     public ConfigData getConfigData() {
         return configData;
     }
-
     public int getIndividual_size() {
         return individual_size;
     }
-
+    public int getGeneration_count() {
+        return generation_count;
+    }
 }
