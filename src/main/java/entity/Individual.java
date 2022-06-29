@@ -23,7 +23,10 @@ public class Individual extends Thread{
 //    New Individual
     public Individual(int individual_size, String individual_name, List<IntersectionData> intersectionsData, String generation_configJson_path){
         this.individual_size = individual_size;
-        this.intersectionsData_individual_copy = new ArrayList<>(List.copyOf(intersectionsData));
+        this.intersectionsData_individual_copy = new ArrayList<>();
+        for(IntersectionData id: intersectionsData){
+            this.intersectionsData_individual_copy.add(new IntersectionData(id));
+        }
         this.individual_name = individual_name;
         this.generation_configJson_path = generation_configJson_path;
         setIndividual_intersectionsJson_path();
@@ -32,7 +35,10 @@ public class Individual extends Thread{
 
     public Individual(int individual_size, String individual_name, List<IntersectionData> intersectionsData, ArrayList<Intersection> intersections_enum, String generation_configJson_path){
         this.individual_size = individual_size;
-        this.intersectionsData_individual_copy = new ArrayList<>(List.copyOf(intersectionsData));
+        this.intersectionsData_individual_copy = new ArrayList<>();
+        for(IntersectionData id: intersectionsData){
+            this.intersectionsData_individual_copy.add(new IntersectionData(id));
+        }
         this.individual_name = individual_name;
         this.intersections_enum = intersections_enum;
         this.generation_configJson_path = generation_configJson_path;

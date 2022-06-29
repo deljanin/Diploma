@@ -16,6 +16,15 @@ public class IntersectionData {
         return type;
     }
 
+    public IntersectionData(IntersectionData obj) {
+        this.id = obj.id;
+        this.type = obj.type;
+        this.arc1 = obj.arc1;
+        this.arc2 = obj.arc2;
+        this.x = obj.x;
+        this.y = obj.y;
+    }
+
     @Override
     public String toString() {
         return "IntersectionData{" +
