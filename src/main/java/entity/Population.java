@@ -4,13 +4,12 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import data.ConfigData;
-import data.DataWriter;
+import data.DataManager;
 import data.IntersectionData;
 
 import java.io.*;
 import java.lang.reflect.Type;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 
 public class Population {
@@ -45,8 +44,10 @@ public class Population {
     public void initialiseGeneration() {
 //      Here we can change the config data
         configData_generation_copy.simulationSpeed = 1.0;
-        DataWriter dataWriter = new DataWriter(generation_count);
-        dataWriter.population_write(configData_generation_copy);
+        configData_generation_copy.timeInSec = 21600;
+
+        DataManager dataManager = new DataManager(generation_count);
+        dataManager.population_write(configData_generation_copy);
         generation_configJson_path = "generations" + System.getProperty("file.separator") + generation_count;
         if(population == null) {
             population = new Vector<>();
@@ -60,23 +61,18 @@ public class Population {
                 population.get(i).setIndividual_intersectionsJson_path();
             }
         }
-
-//        TODO Here we are changing the individual copies of the IntersectionsData
         population.forEach(Individual::initialise);
-        System.out.println();
-//        TODO Here they are not changed somehow?????
-
-        for (int i = 0; i < population.size(); i++) {
-            for (int j = 0; j < population.get(i).getIntersectionsData_individual_copy().size(); j++) {
-                System.out.print(population.get(i).getIntersectionsData_individual_copy().get(j).getType());
-            }
-            System.out.println();
-        }
-
-        population.forEach(i -> dataWriter.individual_write(i.getIndividual_name(),i.getIntersectionsData_individual_copy()));
+        population.forEach(i -> dataManager.individual_write(i.getIndividual_name(),i.getIntersectionsData_individual_copy()));
         this.generation_count++;
     }
 
+    public Individual getFittestIndividual(){
+        return population.get(0);
+    }
+    public Individual getFittestIndividualSORTED(){
+        Collections.sort(population, new IndividualComparator());
+        return population.get(0);
+    }
 
     public List<IntersectionData> loadIntersections(){
         Type listType = new TypeToken<ArrayList<IntersectionData>>() {}.getType();

@@ -1,6 +1,7 @@
 package entity;
 
 import algorithms.GA;
+import data.DataManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,7 @@ public class Optimization  {
     private int parties;
     private int iteration;
     private int stopCondition;
+    private DataManager csvWriter;
 
     public Optimization(int parties, Population population, GA ga, int stopCondition ){/* simulator config, stop condition ....*/
         this.parties = parties;
@@ -21,60 +23,51 @@ public class Optimization  {
         this.population = population;
         this.ga = ga;
         this.generation_count = 0;
+        csvWriter = new DataManager();
     }
 
     public Population Start(){
-//        Implements a barrier and loops until stop condition is met
-//        In every iteration calls the 3 methods from GA algorithm
-//        Returns modified population at the end
-
+//        TODO Fix infinite threads generation
         ExecutorService executorService = Executors.newFixedThreadPool(parties);
 
+        int mutationChance = 10;
+
+        List<Callable<Object>> callables = new ArrayList<>();
+        List<Future<Object>> futures = null;
         for (int i = 0; i< stopCondition; i++) {
             population.initialiseGeneration();
 
-            List<Callable<Object>> callables = new ArrayList<>();
             for (Individual individual: population.getPopulation()){
                 callables.add(Executors.callable(individual));
             }
+
             try {
-                List<Future<Object>> futures = executorService.invokeAll(callables);
+                futures = executorService.invokeAll(callables);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            System.out.println("Population ended.");
 
-            System.out.println("Pop size: " + population.getPopulation().size());
+            for (Future<Object> f : futures){
+                System.out.println(f.isDone());
+            }
+//            System.out.println("Population ended.");
+
+            csvWriter.generation_csv_write(population.getFittestIndividualSORTED(),population, mutationChance);
+//            Deletes previous generation. DO NOT MOVE ANYWHERE!!!!
+            csvWriter.delete_generation_files(population);
+
+//            System.out.println("Pop size: " + population.getPopulation().size());
             this.population = ga.select(population);
-            System.out.println("Pop size: " + population.getPopulation().size());
+//            System.out.println("Pop size: " + population.getPopulation().size());
             this.population = ga.crossover(population);
-            System.out.println("Pop size: " + population.getPopulation().size());
-            this.population = ga.mutate(population, 10);
-
-
-//      TODO We need to remove individual files which were already executed and completed.
-
+//            System.out.println("Pop size: " + population.getPopulation().size());
+            this.population = ga.mutate(population, mutationChance);
 
 
         }
 
-//        TESTING:
-//        population.initialiseGeneration();
-//        System.out.println("Pop size: " + population.getPopulation().size());
-//        this.population = ga.select(population);
-//        System.out.println("Pop size: " + population.getPopulation().size());
-//        this.population = ga.crossover(population);
-//        System.out.println("Pop size: " + population.getPopulation().size());
-//        this.population = ga.mutate(population, 10);
-//        population.getPopulation().forEach(i -> i.start());
-
-//        System.out.println(population.getPopulation().get(0).getIntersections_enum());
-//        this.population = ga.crossover(population);
-//        System.out.println(population.getPopulation().get(0).getIntersections_enum());
-//        this.population = ga.mutate(population, 10);
-//        System.out.println(population.getPopulation().get(0).getIntersections_enum());
-//        population.crossover();
-//        population.mutate(10);
+        csvWriter.close_csv_writer();
+        executorService.shutdown();
         return population;
     }
 }

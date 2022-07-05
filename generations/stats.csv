@@ -1,0 +1,4 @@
+generation,population_size,mutation_factor,individual_name,best_fitness
+1,4,10,0_3,19
+2,4,10,1_2,23
+3,4,10,2_1,23

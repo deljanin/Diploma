@@ -51,7 +51,7 @@ public class Individual extends Thread{
         String path = System.getProperty("user.dir");
         ProcessBuilder builder;
         String command = "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false .." + separator + generation_configJson_path + separator + "config.json" + " .." + separator + individual_intersectionsJson_path;
-        System.out.println(command);
+//        System.out.println(command);
         if (System.getProperty("os.name").startsWith("Windows")) {
             builder = new ProcessBuilder(
                     "cmd.exe", "/c", command);
@@ -70,7 +70,7 @@ public class Individual extends Thread{
             e.printStackTrace();
         }
         this.fitness = Integer.parseInt(out);
-        System.out.println(individual_name+" Simulation time: " + fitness);
+//        System.out.println(individual_name+" Simulation time: " + fitness);
     }
 
     public void initialise() {
@@ -79,14 +79,6 @@ public class Individual extends Thread{
                 this.intersectionsData_individual_copy.get(i).setType(type_converter(intersections_enum.get(i)));
             }
         }
-
-
-
-        System.out.println("Changed in Individual class");
-        for (int i = 0; i < intersectionsData_individual_copy.size(); i++) {
-            System.out.print(intersectionsData_individual_copy.get(i).getType());
-        }
-        System.out.println();
     }
 
     private void randomize_intersection(){
