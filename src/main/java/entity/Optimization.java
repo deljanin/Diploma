@@ -5,6 +5,7 @@ import data.DataManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.*;
 
 public class Optimization  {
@@ -16,6 +17,7 @@ public class Optimization  {
     private int stopCondition;
     private DataManager csvWriter;
     private int mutationChance;
+    private ArrayBlockingQueue<Individual> queue;
 
     public Optimization(int parties, Population population, GA ga, int stopCondition, int mutationChance){
         this.parties = parties;
@@ -25,6 +27,7 @@ public class Optimization  {
         this.ga = ga;
         this.generation_count = 0;
         this.mutationChance = mutationChance;
+        queue = new ArrayBlockingQueue<>(population.getPopulation_size());
         csvWriter = new DataManager();
     }
 
@@ -32,35 +35,52 @@ public class Optimization  {
 //        TODO Fix infinite threads generation
         ExecutorService executorService = Executors.newFixedThreadPool(parties);
 
-        List<Callable<Object>> callables = new ArrayList<>();
+//        List<Callable<Object>> callables = new ArrayList<>();
+//        List<Future<Object>> futures = null;
+
+        List<Callable<Object>> callableExecutors = new ArrayList<>(parties);
+        List<Executor> executors = new ArrayList<>(parties);
+
         List<Future<Object>> futures = null;
+
+        for (int i = 0; i < parties; i++) {
+            executors.add(new Executor());
+//            callableExecutors.add(Executors.callable(new Executor()));
+        }
+
 
         for (int i = 0; i< stopCondition; i++) {
             population.initialiseGeneration();
-            System.out.println(population.getPopulation().size());
-            for (Individual individual: population.getPopulation()){
-                callables.add(Executors.callable(individual));
-            }
 
-            try {
-                futures = executorService.invokeAll(callables);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.out.println(futures.size());
-            for (Future<Object> f : futures){
+            queue.addAll(population.getPopulation());
+//            System.out.println(queue.size());
+            int limit = parties;
+            while (!queue.isEmpty()){
+                if(limit > queue.size()) limit = queue.size();
+                for (int j = 0; j < limit; j++) {
+                    executors.get(j).initialise(queue.poll());
+                }
+                for (int j = 0; j < limit; j++) {
+                    callableExecutors.add(Executors.callable(executors.get(j)));
+                }
                 try {
-                    f.get();
+                    futures = executorService.invokeAll(callableExecutors);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
                 }
-                System.out.println(f.isDone());
+                for (Future<Object> f : futures){
+                    try {
+                        f.get();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println(f.isDone());
+                }
+                callableExecutors.clear();
             }
-            callables = new ArrayList<>();
-
-            System.out.println(futures.size());
+//            System.out.println(queue.size());
 //            System.out.println("Population ended.");
 
             csvWriter.generation_csv_write(population.getFittestIndividualSORTED(),population, mutationChance);
@@ -73,7 +93,6 @@ public class Optimization  {
             this.population = ga.crossover(population);
 //            System.out.println("Pop size: " + population.getPopulation().size());
             this.population = ga.mutate(population, mutationChance);
-
 
         }
 

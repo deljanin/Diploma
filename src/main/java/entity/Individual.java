@@ -75,6 +75,7 @@ public class Individual extends Thread{
             this.fitness = Integer.MAX_VALUE;
         }
         System.out.println(this.getName()+ " " + individual_name+" Simulation time: " + fitness);
+        this.interrupt();
     }
 
     public void initialise() {
@@ -103,6 +104,10 @@ public class Individual extends Thread{
 
     public int getFitness() {
         return this.fitness;
+    }
+
+    public void setFitness(int fitness) {
+        this.fitness = fitness;
     }
 
     public int type_converter(Intersection i){
@@ -146,4 +151,7 @@ public class Individual extends Thread{
         return individual_name;
     }
 
+    public String getIndividual_intersectionsJson_path() {
+        return individual_intersectionsJson_path;
+    }
 }
