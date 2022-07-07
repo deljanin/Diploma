@@ -15,14 +15,16 @@ public class Optimization  {
     private int iteration;
     private int stopCondition;
     private DataManager csvWriter;
+    private int mutationChance;
 
-    public Optimization(int parties, Population population, GA ga, int stopCondition ){/* simulator config, stop condition ....*/
+    public Optimization(int parties, Population population, GA ga, int stopCondition, int mutationChance){
         this.parties = parties;
         this.stopCondition = stopCondition;
         this.iteration = 0;
         this.population = population;
         this.ga = ga;
         this.generation_count = 0;
+        this.mutationChance = mutationChance;
         csvWriter = new DataManager();
     }
 
@@ -30,13 +32,12 @@ public class Optimization  {
 //        TODO Fix infinite threads generation
         ExecutorService executorService = Executors.newFixedThreadPool(parties);
 
-        int mutationChance = 10;
-
         List<Callable<Object>> callables = new ArrayList<>();
         List<Future<Object>> futures = null;
+
         for (int i = 0; i< stopCondition; i++) {
             population.initialiseGeneration();
-
+            System.out.println(population.getPopulation().size());
             for (Individual individual: population.getPopulation()){
                 callables.add(Executors.callable(individual));
             }
@@ -46,10 +47,20 @@ public class Optimization  {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
+            System.out.println(futures.size());
             for (Future<Object> f : futures){
+                try {
+                    f.get();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
                 System.out.println(f.isDone());
             }
+            callables = new ArrayList<>();
+
+            System.out.println(futures.size());
 //            System.out.println("Population ended.");
 
             csvWriter.generation_csv_write(population.getFittestIndividualSORTED(),population, mutationChance);

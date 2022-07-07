@@ -46,7 +46,9 @@ public class GenericGA extends GA{
             newGen.add(t.getSecond());
         }
         newGen.addAll(pop.getPopulation().subList(0,pop.getPopulation().size()));
-        return new Population(pop.getPopulation_size(), pop.getIntersectionsData(), pop.getConfigData(), newGen, pop.getGeneration_count());
+        pop.setPopulation(newGen);
+        return pop;
+//        return new Population(pop.getPopulation_size(), pop.getIntersectionsData(), pop.getConfigData(), newGen, pop.getGeneration_count());
     }
 
     private Intersection[] makeIntersectionArrWoutSpecific(Intersection i){
@@ -63,7 +65,7 @@ public class GenericGA extends GA{
         Random r = new Random();
         Vector<Individual> mutatedPopulation = new Vector<>(pop.getPopulation());
 
-        Intersection[] intersectionsWoutBASIC = makeIntersectionArrWoutSpecific(BASIC);
+        Intersection[] intersectionsWoutBASIC = makeIntersectionArrWoutSpecific(Intersection.BASIC);
         Intersection[] intersectionsWoutSEMAPHORE = makeIntersectionArrWoutSpecific(Intersection.SEMAPHORE);
         Intersection[] intersectionsWoutROUNDABOUT = makeIntersectionArrWoutSpecific(Intersection.ROUNDABOUT);
         for (int i = 0; i < pop.getPopulation().size(); i++) {
@@ -83,7 +85,9 @@ public class GenericGA extends GA{
                 }
             }
         }
-        return new Population(pop.getPopulation().size(), pop.getIntersectionsData(), pop.getConfigData() ,mutatedPopulation, pop.getGeneration_count());
+        pop.setPopulation(mutatedPopulation);
+        return pop;
+//        return new Population(pop.getPopulation().size(), pop.getIntersectionsData(), pop.getConfigData() ,mutatedPopulation, pop.getGeneration_count());
     }
 
 
@@ -92,6 +96,8 @@ public class GenericGA extends GA{
         Vector<Individual> newGen = new Vector<>(pop.getPopulation().size());
         Collections.sort(pop.getPopulation(), new IndividualComparator());
         newGen.addAll(pop.getPopulation().subList(0,pop.getPopulation().size()/2));
-        return new Population(pop.getPopulation_size(), pop.getIntersectionsData(), pop.getConfigData(), newGen, pop.getGeneration_count());
+        pop.setPopulation(newGen);
+        return pop;
+//        return new Population(pop.getPopulation_size(), pop.getIntersectionsData(), pop.getConfigData(), newGen, pop.getGeneration_count());
     }
 }

@@ -69,8 +69,12 @@ public class Individual extends Thread{
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.fitness = Integer.parseInt(out);
-//        System.out.println(individual_name+" Simulation time: " + fitness);
+        try {
+            this.fitness = Integer.parseInt(out);
+        }catch (NumberFormatException e){
+            this.fitness = Integer.MAX_VALUE;
+        }
+        System.out.println(this.getName()+ " " + individual_name+" Simulation time: " + fitness);
     }
 
     public void initialise() {

@@ -106,19 +106,13 @@ public class Population {
             e.printStackTrace();
         }
 
-
         config = new Gson().fromJson(resultStringBuilder.toString(), ConfigData.class);
-
-//        try{
-//
-////            config = new Gson().fromJson(Files.readString(Paths.get("simulator/config.json")), ConfigData.class);
-//            } catch(IOException e)
-//            {
-//                e.printStackTrace();
-//            }
         return config;
     }
 
+    public void setPopulation(Vector<Individual> population) {
+        this.population = population;
+    }
     public Vector<Individual> getPopulation() {
         return population;
     }
