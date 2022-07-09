@@ -3,6 +3,7 @@ package entity;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
+import data.Config;
 import data.ConfigData;
 import data.DataManager;
 import data.IntersectionData;
@@ -22,11 +23,14 @@ public class Population {
     private String generation_configJson_path;
     private int generation_count;
 
-    public Population(int population_size) {
-        this.population_size = population_size;
+    public Population(Config config) {
+        this.population_size = config.getPopulation_size();
         this.intersectionsData = loadIntersections();
         this.configData = loadConfig();
         this.configData_generation_copy = new ConfigData(configData);
+        this.configData_generation_copy.simulationSpeed = config.getSimulationSpeed();
+        this.configData_generation_copy.timeInSec = config.getTimeInSec();
+        this.configData_generation_copy.seed = config.getSeed();
         this.individual_size = intersectionsData.size();
         this.generation_count = 0;
     }
@@ -43,8 +47,8 @@ public class Population {
 
     public void initialiseGeneration() {
 //      Here we can change the config data
-        configData_generation_copy.simulationSpeed = 1.0;
-        configData_generation_copy.timeInSec = 21600;
+
+
 
         DataManager dataManager = new DataManager(generation_count);
         dataManager.population_write(configData_generation_copy);

@@ -48,7 +48,6 @@ public class Executor extends Thread{
         System.out.println(this.getName()+ " " + individual.getIndividual_name() + " Simulation time: " + individual.getFitness());
     }
 
-
     public void start(){
         new Thread(this).start();
     }

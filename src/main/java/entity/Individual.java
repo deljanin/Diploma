@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class Individual extends Thread{
+public class Individual{
     private ArrayList<Intersection> intersections_enum;
     private int fitness;
     private final int individual_size;
@@ -45,38 +45,6 @@ public class Individual extends Thread{
         setIndividual_intersectionsJson_path();
     }
 
-    @Override
-    public void run() {
-        System.out.println(this.getName()+ " started");
-        String path = System.getProperty("user.dir");
-        ProcessBuilder builder;
-        String command = "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false .." + separator + generation_configJson_path + separator + "config.json" + " .." + separator + individual_intersectionsJson_path;
-//        System.out.println(command);
-        if (System.getProperty("os.name").startsWith("Windows")) {
-            builder = new ProcessBuilder(
-                    "cmd.exe", "/c", command);
-        } else {
-            builder = new ProcessBuilder(
-                    "bash", "-c", command);
-        }
-        builder.redirectErrorStream(true);
-        Process p = null;
-        String out = null;
-        try {
-            p = builder.start();
-            BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            out = r.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            this.fitness = Integer.parseInt(out);
-        }catch (NumberFormatException e){
-            this.fitness = Integer.MAX_VALUE;
-        }
-        System.out.println(this.getName()+ " " + individual_name+" Simulation time: " + fitness);
-        this.interrupt();
-    }
 
     public void initialise() {
         for (int i = 0; i < this.intersectionsData_individual_copy.size(); i++) {
@@ -96,10 +64,6 @@ public class Individual extends Thread{
 
     public void setIndividual_intersectionsJson_path(){
         this.individual_intersectionsJson_path = generation_configJson_path + separator + individual_name + separator +"intersections.json";
-    }
-
-    public void start(){
-        new Thread(this).start();
     }
 
     public int getFitness() {
@@ -153,5 +117,13 @@ public class Individual extends Thread{
 
     public String getIndividual_intersectionsJson_path() {
         return individual_intersectionsJson_path;
+    }
+
+    public void print() {
+        for (int i = 0; i < intersections_enum.size(); i++) {
+            if(i==(intersections_enum.size()/2)) System.out.print(" ");
+            System.out.print(type_converter(intersections_enum.get(i)));
+        }
+        System.out.println();
     }
 }

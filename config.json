@@ -1,1 +1,9 @@
-{"population_size":4,"thread_count":4,"stopCondition":10000,"mutationChance":10}
+{
+  "population_size": 20,
+  "thread_count": 6,
+  "stopCondition": 10000,
+  "mutationChance": 10,
+  "simulationSpeed": 1,
+  "seed": 5,
+  "timeInSec": 21600
+}

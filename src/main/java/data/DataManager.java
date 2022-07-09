@@ -21,10 +21,12 @@ public class DataManager {
     public DataManager(int generation_count){
         this.generation_count = generation_count;
         this.generation_folder = new File("generations" + separator + generation_count);
+
     }
 
     public DataManager(){
         this.generation_folder = new File("generations" + separator + generation_count);
+        create_generations_folder();
         generation_csv_initialise();
     }
 
@@ -85,7 +87,7 @@ public class DataManager {
     }
 
     public void generation_csv_write(Individual i, Population pop, int mutationChance){
-        String data = pop.getGeneration_count() +","
+        String data = pop.getGeneration_count()-1 +","
                 + pop.getPopulation_size() + ","
                 + mutationChance + ","
                 + i.getIndividual_name() + ","
@@ -104,5 +106,9 @@ public class DataManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    private void create_generations_folder(){
+        File generations_folder = new File("generations");
+        generations_folder.mkdir();
     }
 }

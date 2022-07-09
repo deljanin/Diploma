@@ -32,20 +32,13 @@ public class Optimization  {
     }
 
     public Population Start(){
-//        TODO Fix infinite threads generation
         ExecutorService executorService = Executors.newFixedThreadPool(parties);
-
-//        List<Callable<Object>> callables = new ArrayList<>();
-//        List<Future<Object>> futures = null;
-
         List<Callable<Object>> callableExecutors = new ArrayList<>(parties);
         List<Executor> executors = new ArrayList<>(parties);
-
         List<Future<Object>> futures = null;
 
         for (int i = 0; i < parties; i++) {
             executors.add(new Executor());
-//            callableExecutors.add(Executors.callable(new Executor()));
         }
 
 
@@ -53,7 +46,6 @@ public class Optimization  {
             population.initialiseGeneration();
 
             queue.addAll(population.getPopulation());
-//            System.out.println(queue.size());
             int limit = parties;
             while (!queue.isEmpty()){
                 if(limit > queue.size()) limit = queue.size();
@@ -68,7 +60,7 @@ public class Optimization  {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                for (Future<Object> f : futures){
+                for (Future<Object> f : futures){ // Serves like a barrier of sort
                     try {
                         f.get();
                     } catch (InterruptedException e) {
@@ -76,7 +68,7 @@ public class Optimization  {
                     } catch (ExecutionException e) {
                         e.printStackTrace();
                     }
-                    System.out.println(f.isDone());
+//                    System.out.println(f.isDone());
                 }
                 callableExecutors.clear();
             }
@@ -91,9 +83,9 @@ public class Optimization  {
             this.population = ga.select(population);
 //            System.out.println("Pop size: " + population.getPopulation().size());
             this.population = ga.crossover(population);
-//            System.out.println("Pop size: " + population.getPopulation().size());
+//            population.getPopulation().get(0).print();
             this.population = ga.mutate(population, mutationChance);
-
+//            population.getPopulation().get(0).print();
         }
 
         csvWriter.close_csv_writer();

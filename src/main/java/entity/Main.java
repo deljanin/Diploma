@@ -21,7 +21,7 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Population population = new Population(config.getPopulation_size()); //Take divisible by 4 to work for basicGA
+        Population population = new Population(config); //Take divisible by 4 to work for basicGA
         GenericGA genericGA = new GenericGA();
         Optimization optimization = new Optimization(config.getThread_count(),population,genericGA, config.getStopCondition(), config.getMutationChance());
         optimization.Start();
