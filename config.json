@@ -1,6 +1,6 @@
 {
-  "population_size": 20,
-  "thread_count": 6,
+  "population_size": 8,
+  "thread_count": 0,
   "stopCondition": 10000,
   "mutationChance": 10,
   "simulationSpeed": 1,

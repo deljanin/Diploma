@@ -1,10 +1,10 @@
 package data;
 
 public class Config {
-    int population_size = 4;
-    int thread_count = 4;
-    int stopCondition = 10000;
-    int mutationChance = 10;
+    int population_size;
+    int thread_count;
+    int stopCondition;
+    int mutationChance;
     double simulationSpeed;
     int seed;
     int timeInSec;
@@ -17,6 +17,15 @@ public class Config {
         this.simulationSpeed = config.getSimulationSpeed();
         this.seed = config.getSeed();
         this.timeInSec = config.getTimeInSec();
+    }
+    public Config(){
+        this.population_size = 40;
+        this.thread_count = Runtime.getRuntime().availableProcessors();
+        this.stopCondition = 10000;
+        this.mutationChance = 10;
+        this.simulationSpeed = 1;
+        this.seed = 5;
+        this.timeInSec = 21600;
     }
 
     public int getPopulation_size() {

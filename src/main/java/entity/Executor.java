@@ -9,6 +9,11 @@ public class Executor extends Thread{
     private String generation_configJson_path;
     private String individual_intersectionsJson_path;
     private Individual individual;
+    private boolean debugMode;
+
+    public Executor(boolean debugMode){
+        this.debugMode = debugMode;
+    }
 
     public void initialise(Individual individual){
         this.individual = individual;
@@ -18,11 +23,11 @@ public class Executor extends Thread{
 
     @Override
     public void run() {
-        System.out.println(this.getName()+ " started");
+        if(debugMode) System.out.println(this.getName()+ " started");
         String path = System.getProperty("user.dir");
         ProcessBuilder builder;
         String command = "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false .." + separator + generation_configJson_path + separator + "config.json" + " .." + separator + individual_intersectionsJson_path;
-//        System.out.println(command);
+        if(debugMode) System.out.println(command);
         if (System.getProperty("os.name").startsWith("Windows")) {
             builder = new ProcessBuilder(
                     "cmd.exe", "/c", command);
@@ -45,7 +50,7 @@ public class Executor extends Thread{
         }catch (NumberFormatException e){
             individual.setFitness(Integer.MAX_VALUE);
         }
-        System.out.println(this.getName()+ " " + individual.getIndividual_name() + " Simulation time: " + individual.getFitness());
+        if(debugMode) System.out.println(this.getName()+ " " + individual.getIndividual_name() + " Simulation time: " + individual.getFitness());
     }
 
     public void start(){

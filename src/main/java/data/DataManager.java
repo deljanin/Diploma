@@ -32,7 +32,7 @@ public class DataManager {
 
     public void population_write(ConfigData data){
         File generation_folder = new File("generations" + separator + generation_count);
-        if(!generation_folder.mkdir()) System.out.println("Failed to create generation folder");
+        generation_folder.mkdir();
         try {
             fileWriter = new FileWriter(generation_folder + separator + "config.json");
             fileWriter.write(new Gson().toJson(data));
@@ -44,7 +44,7 @@ public class DataManager {
 
     public void individual_write(String individual_name, ArrayList<IntersectionData> data){
         File individual_folder = new File(generation_folder + separator + individual_name + separator);
-        if(!individual_folder.mkdir()) System.out.println("Failed to create individual folder");
+        individual_folder.mkdir();//if(!) System.out.println("Failed to create individual folder");
         try {
             fileWriter = new FileWriter(individual_folder + separator +"intersections.json");
             fileWriter.write(new Gson().toJson(data));

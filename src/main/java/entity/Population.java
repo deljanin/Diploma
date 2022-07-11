@@ -46,10 +46,7 @@ public class Population {
     }
 
     public void initialiseGeneration() {
-//      Here we can change the config data
-
-
-
+        System.out.println(generation_count);
         DataManager dataManager = new DataManager(generation_count);
         dataManager.population_write(configData_generation_copy);
         generation_configJson_path = "generations" + System.getProperty("file.separator") + generation_count;
@@ -84,6 +81,7 @@ public class Population {
         try {
             reader = new JsonReader(new FileReader("simulator/intersections.json"));
         } catch (FileNotFoundException e) {
+            System.out.println("Failed to read intersection.json");
             e.printStackTrace();
         }
         return new Gson().fromJson(reader, listType);
@@ -95,6 +93,7 @@ public class Population {
         try {
             fileReader = new FileReader("simulator/config.json");
         } catch (FileNotFoundException e) {
+            System.out.println("Failed to read config.json");
             e.printStackTrace();
         }
         StringBuilder resultStringBuilder = new StringBuilder();
