@@ -14,21 +14,22 @@ public class Optimization  {
     private int parties;
     private int iteration;
     private int stopCondition;
-    private DataManager csvWriter;
+    private DataManager dataManager;
     private int mutationChance;
     private ArrayBlockingQueue<Individual> queue;
+    private String algorithm;
 
-    public Optimization(int parties, Population population, GA ga, int stopCondition, int mutationChance){
+    public Optimization(int parties, Population population, GA ga, int stopCondition, int mutationChance, String algorithm){
         if(parties == 0) parties = Runtime.getRuntime().availableProcessors();
         this.parties = parties;
-        System.out.println("Threads Count   = " + this.parties);
         this.stopCondition = stopCondition;
         this.iteration = 0;
         this.population = population;
         this.ga = ga;
         this.mutationChance = mutationChance;
         queue = new ArrayBlockingQueue<>(population.getPopulation_size());
-        csvWriter = new DataManager();
+        dataManager = new DataManager();
+        this.algorithm = algorithm;
     }
 
     public Population Start(boolean debugMode){
@@ -67,27 +68,30 @@ public class Optimization  {
                     } catch (ExecutionException e) {
                         e.printStackTrace();
                     }
-                    if(debugMode) System.out.println(f.isDone());
+//                    if(debugMode) System.out.println(f.isDone());
                 }
                 callableExecutors.clear();
             }
             if(debugMode) System.out.println(queue.size());
             if(debugMode) System.out.println("Population ended.");
 
-            csvWriter.generation_csv_write(population.getFittestIndividualSORTED(), population, mutationChance);
+            dataManager.generation_csv_write(population.getFittestIndividualSORTED(), population, mutationChance, algorithm);
 //            Deletes previous generation. DO NOT MOVE ANYWHERE!!!!
-            csvWriter.delete_generation_files(population);
+            dataManager.delete_generation_files(population);
 
-            if(debugMode) System.out.println("Pop size: " + population.getPopulation().size());
+            if(debugMode) System.out.println("Pop size before: " + population.getPopulation().size());
             this.population = ga.select(population);
-            if(debugMode) System.out.println("Pop size: " + population.getPopulation().size());
+            if(debugMode) System.out.println("Pop size after: " + population.getPopulation().size());
+            if(debugMode) population.getPopulation().get(0).printIndividualIntersections();
+            if(debugMode) population.getPopulation().get(1).printIndividualIntersections();
             this.population = ga.crossover(population);
-            if(debugMode) population.getPopulation().get(0).print();
+            if(debugMode) population.getPopulation().get(0).printIndividualIntersections();
+            if(debugMode) population.getPopulation().get(1).printIndividualIntersections();
             this.population = ga.mutate(population, mutationChance);
-            if(debugMode) population.getPopulation().get(0).print();
+//            if(debugMode) population.getPopulation().get(0).printIndividualIntersections();
         }
 
-        csvWriter.close_csv_writer();
+        dataManager.close_csv_writer();
         executorService.shutdown();
         return population;
     }

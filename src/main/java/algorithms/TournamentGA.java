@@ -5,9 +5,7 @@ import entity.*;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static entity.Intersection.*;
-
-public class GenericGA extends GA{
+public class TournamentGA extends GA{
 
     private Tuple crossoverPair(Individual individual1, Individual individual2, Population pop){
         int end = individual1.getIntersections_enum().size();
@@ -28,7 +26,7 @@ public class GenericGA extends GA{
                         pop.getIntersectionsData(),
                         indi1,
                         individual1.getGeneration_configJson_path()
-                        ),
+                ),
 
                 new Individual(pop.getIntersectionsData().size(),
                         "ToBeSet",
@@ -92,12 +90,33 @@ public class GenericGA extends GA{
 
 
     @Override
-    public Population select(Population pop) { /*Selects HALF*/
+    public Population select(Population pop) {
+        //1. Select k individuals from the population and perform a tournament amongst them
+        //2. Select the best individual from the k individuals
+        //3. Repeat process 1 and 2 until you have the desired amount of population
+
         Vector<Individual> newGen = new Vector<>(pop.getPopulation().size()/2);
-        Collections.sort(pop.getPopulation(), new IndividualComparator());
-        newGen.addAll(pop.getPopulation().subList(0,pop.getPopulation().size()/2));
+
+        int tournamentSize = 5;
+        Vector<Individual> tournamentIndividuals = new Vector<>(tournamentSize);
+        for (int i = 0; i < pop.getPopulation_size()/2; i++) {
+            Collections.shuffle(pop.getPopulation());
+            for (int j = 0; j < tournamentSize; j++) {
+                tournamentIndividuals.add(pop.getPopulation().get(j));
+            }
+//            tournamentIndividuals.forEach(ind -> System.out.print(ind.getFitness() + " "));
+//            System.out.println();
+            Collections.sort(tournamentIndividuals,new IndividualComparator());
+//            System.out.println(tournamentIndividuals.get(0).getFitness());
+            pop.getPopulation().remove(tournamentIndividuals.get(0));
+            newGen.add(tournamentIndividuals.get(0));
+            tournamentIndividuals.clear();
+        }
         pop.setPopulation(newGen);
+
         return pop;
 //        return new Population(pop.getPopulation_size(), pop.getIntersectionsData(), pop.getConfigData(), newGen, pop.getGeneration_count());
     }
 }
+
+

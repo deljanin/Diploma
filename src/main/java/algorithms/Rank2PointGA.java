@@ -5,30 +5,28 @@ import entity.*;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static entity.Intersection.*;
-
-public class GenericGA extends GA{
+public class Rank2PointGA extends GA{
 
     private Tuple crossoverPair(Individual individual1, Individual individual2, Population pop){
         int end = individual1.getIntersections_enum().size();
-        int half = end/2;
-        List<Intersection> individual1_firstHalf = individual1.getIntersections_enum().subList(0,half);
-        List<Intersection> individual2_firstHalf = individual2.getIntersections_enum().subList(0,half);
+        int firstSplit = end/3;
+        int secondSplit = end*2/3;
+        System.out.println("first: " + firstSplit + " second: " + secondSplit + " end: " + end);
 
-        List<Intersection> individual1_secondHalf = individual1.getIntersections_enum().subList(half,end);
-        List<Intersection> individual2_secondHalf = individual2.getIntersections_enum().subList(half,end);
+        ArrayList<Intersection> indi1 = new ArrayList<>(individual1.getIntersections_enum().subList(0,firstSplit));
+        indi1.addAll(individual2.getIntersections_enum().subList(firstSplit,secondSplit));
+        indi1.addAll(individual1.getIntersections_enum().subList(secondSplit,end));
 
-        ArrayList<Intersection> indi1 = new ArrayList<>(individual1_firstHalf);
-        indi1.addAll(individual2_secondHalf);
-        ArrayList<Intersection> indi2 = new ArrayList<>(individual2_firstHalf);
-        indi2.addAll(individual1_secondHalf);
+        ArrayList<Intersection> indi2 = new ArrayList<>(individual2.getIntersections_enum().subList(0,firstSplit));
+        indi2.addAll(individual1.getIntersections_enum().subList(firstSplit,secondSplit));
+        indi2.addAll(individual2.getIntersections_enum().subList(secondSplit,end));
         return new Tuple(
                 new Individual(pop.getIntersectionsData().size(),
                         "ToBeSet",
                         pop.getIntersectionsData(),
                         indi1,
                         individual1.getGeneration_configJson_path()
-                        ),
+                ),
 
                 new Individual(pop.getIntersectionsData().size(),
                         "ToBeSet",
@@ -58,7 +56,6 @@ public class GenericGA extends GA{
         }
         return tmp.toArray(new Intersection[0]);
     }
-
 
     @Override
     public Population mutate(Population pop, int mutation_chance) {
@@ -92,12 +89,46 @@ public class GenericGA extends GA{
 
 
     @Override
-    public Population select(Population pop) { /*Selects HALF*/
-        Vector<Individual> newGen = new Vector<>(pop.getPopulation().size()/2);
+    public Population select(Population pop) {
+        int popSize = pop.getPopulation_size();
+        Vector<Individual> newGen = new Vector<>(popSize/2);
+
+        // Sweep through all elements in A
+        // for each element count the number
+        // of less than and equal elements
+        // separately in r and s
+        pop.getPopulation().forEach(i -> System.out.print(i.getFitness() + " "));
+        System.out.println();
+        for (int i = 0; i < popSize; i++) {
+            int r = 1, s = 1;
+
+            for (int j = 0; j < popSize; j++)
+            {
+                if (j != i && pop.getPopulation().get(j).getFitness() < pop.getPopulation().get(i).getFitness())
+                    r += 1;
+
+                if (j != i && pop.getPopulation().get(j).getFitness() == pop.getPopulation().get(i).getFitness())
+                    s += 1;
+            }
+            // Use formula to obtain  rank
+            pop.getPopulation().get(i).setFitness(r + (float)(s - 1) / (float) 2);
+        }
+
+        pop.getPopulation().forEach(i -> System.out.print(i.getFitness() + " "));
+        System.out.println();
+
+
         Collections.sort(pop.getPopulation(), new IndividualComparator());
-        newGen.addAll(pop.getPopulation().subList(0,pop.getPopulation().size()/2));
+        for (int i = 0; i < popSize / 2; i++) {
+            newGen.add(pop.getPopulation().get(i));
+        }
+
+//        Collections.sort(newGen, new IndividualComparator());
+
+        System.out.println("Pop size inside GA class: " + newGen.size());
         pop.setPopulation(newGen);
+        pop.getPopulation().forEach(i -> System.out.print(i.getFitness() + " "));
+        System.out.println();
         return pop;
-//        return new Population(pop.getPopulation_size(), pop.getIntersectionsData(), pop.getConfigData(), newGen, pop.getGeneration_count());
     }
 }

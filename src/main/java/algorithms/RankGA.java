@@ -5,9 +5,7 @@ import entity.*;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static entity.Intersection.*;
-
-public class GenericGA extends GA{
+public class RankGA extends GA{
 
     private Tuple crossoverPair(Individual individual1, Individual individual2, Population pop){
         int end = individual1.getIntersections_enum().size();
@@ -28,7 +26,7 @@ public class GenericGA extends GA{
                         pop.getIntersectionsData(),
                         indi1,
                         individual1.getGeneration_configJson_path()
-                        ),
+                ),
 
                 new Individual(pop.getIntersectionsData().size(),
                         "ToBeSet",
@@ -90,14 +88,52 @@ public class GenericGA extends GA{
 //        return new Population(pop.getPopulation().size(), pop.getIntersectionsData(), pop.getConfigData() ,mutatedPopulation, pop.getGeneration_count());
     }
 
-
     @Override
-    public Population select(Population pop) { /*Selects HALF*/
-        Vector<Individual> newGen = new Vector<>(pop.getPopulation().size()/2);
-        Collections.sort(pop.getPopulation(), new IndividualComparator());
-        newGen.addAll(pop.getPopulation().subList(0,pop.getPopulation().size()/2));
+    public Population select(Population pop) {
+        int popSize = pop.getPopulation_size();
+        Vector<Individual> newGen = new Vector<>(popSize/2);
+
+//        pop.getPopulation().forEach(i -> System.out.print(i.getFitness() + " "));
+//        System.out.println();
+//        for (int i = 0; i < popSize; i++) {
+//            int r = 1, s = 1;
+//
+//            for (int j = 0; j < popSize; j++)
+//            {
+//                if (j != i && pop.getPopulation().get(j).getFitness() < pop.getPopulation().get(i).getFitness())
+//                    r += 1;
+//
+//                if (j != i && pop.getPopulation().get(j).getFitness() == pop.getPopulation().get(i).getFitness())
+//                    s += 1;
+//            }
+//            // Use formula to obtain  rank
+//            pop.getPopulation().get(i).setFitness(r + (float)(s - 1) / (float) 2);
+//        }
+//
+//        pop.getPopulation().forEach(i -> System.out.print(i.getFitness() + " "));
+//        System.out.println();
+
+
+//        Collections.sort(pop.getPopulation(), new IndividualComparator());
+//        for (int i = 0; i < popSize / 2; i++) {
+//            newGen.add(pop.getPopulation().get(i));
+//        }
+
+//        Collections.sort(newGen, new IndividualComparator());
+
+        float generationFitness = 0;
+        for (int i = 0; i < popSize; i++) {
+            generationFitness += pop.getPopulation().get(i).getFitness();
+        }
+
+
+
+
+
+        System.out.println("Pop size inside GA class: " + newGen.size());
         pop.setPopulation(newGen);
+        pop.getPopulation().forEach(i -> System.out.print(i.getFitness() + " "));
+        System.out.println();
         return pop;
-//        return new Population(pop.getPopulation_size(), pop.getIntersectionsData(), pop.getConfigData(), newGen, pop.getGeneration_count());
     }
 }

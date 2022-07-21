@@ -1,6 +1,6 @@
 package entity;
 
-import algorithms.GenericGA;
+import algorithms.*;
 import com.google.gson.Gson;
 import data.Config;
 
@@ -23,14 +23,47 @@ public class Main {
         } catch (IOException e) {
             config = new Config();
         }
+
         System.out.println("Config parameters are: " +
-                "\nStop condition  = " + config.getStopCondition() +
-                "\nSimulation time = " + config.getTimeInSec() +
-                "\nPopulation size = " + config.getPopulation_size()
+                "\nPopulation size  = " + config.getPopulation_size() +
+                "\nThread count     = " + config.getThread_count() +
+                "\nMax generations  = " + config.getMaxGenerations() +
+                "\nMutation chance  = " + config.getMutationChance() +
+                "\nSimulation speed = " + config.getSimulationSpeed() +
+                "\nSimulation seed  = " + config.getSeed() +
+                "\nTime in seconds  = " + config.getTimeInSec() +
+                "\nGenetic algo     = " + config.getGA()
         );
         Population population = new Population(config);
-        GenericGA genericGA = new GenericGA();
-        Optimization optimization = new Optimization(config.getThread_count(), population, genericGA, config.getStopCondition(), config.getMutationChance());
+        GA GA;
+        switch (config.getGA()) {
+            case "GenericGA":
+                GA = new GenericGA();
+                break;
+            case "TournamentGA":
+                GA = new TournamentGA();
+                break;
+            case "Tournament2PointGA":
+                GA = new Tournament2PointGA();
+                break;
+            case "TournamentUniformGA":
+                GA = new TournamentUniformGA();
+                break;
+            case "RankGA":
+                GA = new RankGA();
+                break;
+            case "Rank2PointGA":
+                GA = new Rank2PointGA();
+                break;
+            case "RankUniformGA":
+                GA = new RankUniformGA();
+                break;
+            default:
+                GA = new GenericGA();
+        }
+
+
+        Optimization optimization = new Optimization(config.getThread_count(), population, GA, config.getMaxGenerations(), config.getMutationChance(), config.getGA());
         optimization.Start(debugMode);
     }
 }

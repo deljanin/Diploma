@@ -23,11 +23,11 @@ public class Executor extends Thread{
 
     @Override
     public void run() {
-        if(debugMode) System.out.println(this.getName()+ " started");
+//        if(debugMode) System.out.println(this.getName()+ " started");
         String path = System.getProperty("user.dir");
         ProcessBuilder builder;
         String command = "cd \"" + path + separator + "simulator\" && java -jar Simulator.jar false .." + separator + generation_configJson_path + separator + "config.json" + " .." + separator + individual_intersectionsJson_path;
-        if(debugMode) System.out.println(command);
+//        if(debugMode) System.out.println(command);
         if (System.getProperty("os.name").startsWith("Windows")) {
             builder = new ProcessBuilder(
                     "cmd.exe", "/c", command);

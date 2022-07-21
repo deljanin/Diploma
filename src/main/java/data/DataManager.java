@@ -80,15 +80,16 @@ public class DataManager {
     private void generation_csv_initialise() {
         try {
             csvWriter = new FileWriter(statsFile);
-            csvWriter.write("generation,population_size,mutation_factor,individual_name,best_fitness\n");
+            csvWriter.write("generation,population_size,genetic_algorithm,mutation_factor,individual_name,best_fitness\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void generation_csv_write(Individual i, Population pop, int mutationChance){
+    public void generation_csv_write(Individual i, Population pop, int mutationChance, String algorithm){
         String data = pop.getGeneration_count()-1 +","
                 + pop.getPopulation_size() + ","
+                + algorithm + ","
                 + mutationChance + ","
                 + i.getIndividual_name() + ","
                 + i.getFitness() + "\n";

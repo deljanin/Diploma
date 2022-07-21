@@ -3,29 +3,32 @@ package data;
 public class Config {
     int population_size;
     int thread_count;
-    int stopCondition;
+    int max_generations;
     int mutationChance;
     double simulationSpeed;
     int seed;
     int timeInSec;
+    String GA;
 
     public Config(Config config){
         this.population_size = config.getPopulation_size();
         this.thread_count = config.getThread_count();
-        this.stopCondition = config.getStopCondition();
+        this.max_generations = config.getMaxGenerations();
         this.mutationChance = config.getMutationChance();
         this.simulationSpeed = config.getSimulationSpeed();
         this.seed = config.getSeed();
         this.timeInSec = config.getTimeInSec();
+        this.GA = config.getGA();
     }
     public Config(){
         this.population_size = 40;
         this.thread_count = Runtime.getRuntime().availableProcessors();
-        this.stopCondition = 10000;
+        this.max_generations = 10000;
         this.mutationChance = 10;
         this.simulationSpeed = 1;
         this.seed = 5;
         this.timeInSec = 21600;
+        this.GA = "GenericGA";
     }
 
     public int getPopulation_size() {
@@ -44,12 +47,12 @@ public class Config {
         this.thread_count = thread_count;
     }
 
-    public int getStopCondition() {
-        return stopCondition;
+    public int getMaxGenerations() {
+        return max_generations;
     }
 
-    public void setStopCondition(int stopCondition) {
-        this.stopCondition = stopCondition;
+    public void setStopCondition(int max_generations) {
+        this.max_generations = max_generations;
     }
 
     public int getMutationChance() {
@@ -84,4 +87,11 @@ public class Config {
         this.timeInSec = timeInSec;
     }
 
+    public String getGA() {
+        return GA;
+    }
+
+    public void setGA(String GA) {
+        this.GA = GA;
+    }
 }

@@ -11,7 +11,7 @@ import java.util.Random;
 
 public class Individual{
     private ArrayList<Intersection> intersections_enum;
-    private int fitness;
+    private float fitness;
     private final int individual_size;
     private String individual_name;
     private ArrayList<IntersectionData> intersectionsData_individual_copy;
@@ -30,6 +30,7 @@ public class Individual{
         this.individual_name = individual_name;
         this.generation_configJson_path = generation_configJson_path;
         setIndividual_intersectionsJson_path();
+//        one_type_intersection(Intersection.SEMAPHORE);
         randomize_intersection();
     }
 
@@ -62,15 +63,22 @@ public class Individual{
         }
     }
 
+    public void one_type_intersection(Intersection type){
+        this.intersections_enum = new ArrayList<>();
+        for (int i = 0; i < individual_size; i++) {
+            this.intersections_enum.add(type);
+        }
+    }
+
     public void setIndividual_intersectionsJson_path(){
         this.individual_intersectionsJson_path = generation_configJson_path + separator + individual_name + separator +"intersections.json";
     }
 
-    public int getFitness() {
+    public float getFitness() {
         return this.fitness;
     }
 
-    public void setFitness(int fitness) {
+    public void setFitness(float fitness) {
         this.fitness = fitness;
     }
 
@@ -119,9 +127,9 @@ public class Individual{
         return individual_intersectionsJson_path;
     }
 
-    public void print() {
+    public void printIndividualIntersections() {
         for (int i = 0; i < intersections_enum.size(); i++) {
-            if(i==(intersections_enum.size()/2)) System.out.print(" ");
+            if(i==(intersections_enum.size()/3) || i==(intersections_enum.size()*2/3)) System.out.print(" ");
             System.out.print(type_converter(intersections_enum.get(i)));
         }
         System.out.println();

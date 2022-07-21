@@ -1,9 +1,10 @@
 {
   "population_size": 8,
-  "thread_count": 0,
+  "thread_count": 4,
   "stopCondition": 10000,
   "mutationChance": 10,
   "simulationSpeed": 1,
   "seed": 5,
-  "timeInSec": 21600
+  "timeInSec": 21600,
+  "GA": "Tournament2PointGA"
 }
