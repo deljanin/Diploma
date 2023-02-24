@@ -12,6 +12,7 @@ To see the code on your device follow these steps:
 5. Open the new directory with an Editor. You can see the code here. I don't recommend running the code as it is a CLI program.
 
 To run the program continue with:
+
 6. Select the latest version of JAVA JDK in the settings. ( Version 19. as of now. )
 7. Find the Main() function in: diploma/src/main/java/entity/Main.java
 8. Right-click anywhere on the code panel and run the program from there, or just find a way to run this program from Main().
